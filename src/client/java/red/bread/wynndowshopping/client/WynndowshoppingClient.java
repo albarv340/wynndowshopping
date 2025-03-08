@@ -7,15 +7,14 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 public class WynndowshoppingClient implements ClientModInitializer {
     public static boolean cancelContainerClose = false;
     public static boolean highlightSearchedString = false;
+    public static String currentSearchText = "";
 
     @Override
     public void onInitializeClient() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (screen instanceof HandledScreen<?>) {
-                InventoryRenderer.addSearchField(screen, scaledWidth, scaledHeight);
-                ScreenEvents.afterRender(screen).register((screen1, drawContext, mouseX, mouseY, tickDelta) -> {
-                    InventoryRenderer.render(screen1, client, drawContext);
-                });
+                InventoryRenderer.init(screen, scaledWidth, scaledHeight);
+                ScreenEvents.afterRender(screen).register((screen1, drawContext, mouseX, mouseY, tickDelta) -> InventoryRenderer.render(screen1, client, drawContext, scaledWidth, scaledHeight));
             }
         });
     }
