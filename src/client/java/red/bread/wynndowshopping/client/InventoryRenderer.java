@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class InventoryRenderer {
     private static InventoryOverlay inventoryOverlay;
@@ -76,8 +75,7 @@ public class InventoryRenderer {
             for (Slot slot : containerSlots) {
                 String itemName = slot.getStack().getName().getString();
                 if (itemName.equals("Air")) continue;
-                Pattern pattern = Pattern.compile(WynndowshoppingClient.currentSearchText, Pattern.CASE_INSENSITIVE);
-                if (pattern.matcher(itemName).find()) {
+                if (itemName.toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())) {
                     highlightedSlots.add(slot.id);
                 }
             }

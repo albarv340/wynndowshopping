@@ -6,6 +6,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 
 public class SearchTextFieldWidget extends TextFieldWidget {
     long lastClick = 0;
@@ -24,9 +25,22 @@ public class SearchTextFieldWidget extends TextFieldWidget {
         lastClick = System.currentTimeMillis();
     }
 
+    private String evaluateExpression() {
+        try {
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(Utils.eval(getText()));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
+        String evaluatedExpression = evaluateExpression();
+        if (evaluatedExpression != null) {
+            context.drawText(textRenderer, Text.of("=" + evaluatedExpression), getCharacterX(getText().length() - 1) + 10, getY() + 6, 0x00ff00, false);
+        }
         if (WynndowshoppingClient.highlightSearchedString) {
             context.fill(getX(), getY(), getX() + width, getY() + height, new Color(255, 255, 0, 50).getRGB());
         }

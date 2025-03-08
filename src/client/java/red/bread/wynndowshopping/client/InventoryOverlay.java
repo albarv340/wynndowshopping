@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 public class InventoryOverlay {
     private int currentPage = 1;
@@ -53,8 +52,7 @@ public class InventoryOverlay {
         Screens.getButtons(screen).add(searchTextFieldWidget);
         if (shouldRenderItems()) {
             final int itemsPerRow = overlayWidth / slotSize;
-            Pattern pattern = Pattern.compile(WynndowshoppingClient.currentSearchText, Pattern.CASE_INSENSITIVE);
-            List<ItemStack> filteredItems = items.stream().filter(itemStack -> pattern.matcher(itemStack.getName().getString()).find()).toList();
+            List<ItemStack> filteredItems = items.stream().filter(itemStack -> itemStack.getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
             updatePageCounts(filteredItems.size());
             Screens.getButtons(screen).add(getPrevButton());
             Screens.getButtons(screen).add(getPageDisplayButton());
