@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "wynndowshopping",
+  "version": "${version}",
+  "name": "wynndowshopping",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/wynndowshopping/icon.png",
+  "environment": "client",
+  "accessWidener" : "wynndowshopping.accesswidener",
+  "entrypoints": {
+    "client": [
+      "red.bread.wynndowshopping.client.WynndowshoppingClient"
+    ],
+    "main": [
+      "red.bread.wynndowshopping.Wynndowshopping"
+    ]
+  },
+  "mixins": [
+    "wynndowshopping.mixins.json",
+    {
+      "config": "wynndowshopping.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

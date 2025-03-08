@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "red.bread.wynndowshopping.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "CancelContainerCloseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
