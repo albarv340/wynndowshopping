@@ -39,25 +39,20 @@ public class InventoryRenderer {
 
     private static final Set<Integer> highlightedSlots = new HashSet<>();
 
-    public static void render(Screen screen1, MinecraftClient client, DrawContext drawContext, int scaledWidth, int scaledHeight, int mouseX, int mouseY, float tickDelta) {
+    public static void render(Screen screen1, MinecraftClient client, DrawContext drawContext) {
         if (client.player == null || !WynndowshoppingClient.highlightSearchedString) {
             return;
         }
         updateHighlightedSlots();
         List<Slot> slots = client.player.currentScreenHandler.slots;
         final int slotSize = 16;
-        final int slotAmount = slots.size();
 
         final int searchMissColor = new Color(0, 0, 0, 150).getRGB();
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(0.0, 0.0, 358F);
         int screenX = ((HandledScreen<?>) screen1).x;
         int screenY = ((HandledScreen<?>) screen1).y;
-        drawNegativeSpace(screen1, drawContext, scaledWidth, scaledHeight, screenX, screenY, searchMissColor, slots, slotSize, slotAmount);
-        int startSlot = screen1 instanceof InventoryScreen ? 9 : 0;
-        int endSlot = screen1 instanceof InventoryScreen ? slotAmount - 1 : slotAmount;
-        for (int i = startSlot; i < endSlot; i++) {
-            Slot slot = slots.get(i);
+        for (Slot slot : slots) {
             int x = slot.x + screenX;
             int y = slot.y + screenY;
             if (!highlightedSlots.contains(slot.id)) {
@@ -65,40 +60,6 @@ public class InventoryRenderer {
             }
         }
         drawContext.getMatrices().pop();
-    }
-
-    private static void drawNegativeSpace(Screen screen1, DrawContext drawContext, int scaledWidth, int scaledHeight, int screenX, int screenY, int searchMissColor, List<Slot> slots, int slotSize, int slotAmount) {
-        final int slotsPerRow = 9;
-        final int rows = slotAmount / slotsPerRow;
-        final int allSlotWidth = 175;
-        int prevY = 0;
-        int prevX = screenX;
-        // Highlights in armor/crafting/offhand slots not supported
-        int startSlot = screen1 instanceof InventoryScreen ? 9 : 0;
-        int endSlot = screen1 instanceof InventoryScreen ? slotAmount - 1 : slotAmount;
-        drawContext.fill(0, 0, screenX, scaledHeight, searchMissColor);
-        drawContext.fill(screenX + allSlotWidth, 0, scaledWidth, scaledHeight, searchMissColor);
-        for (int i = startSlot; i < endSlot; i++) {
-            Slot slot = slots.get(i);
-            int slotY = screenY + slot.y;
-            int slotX = screenX + slot.x;
-            if (prevY >= 0 && slotY > prevY) {
-                drawContext.fill(screenX, prevY, screenX + allSlotWidth, slotY, searchMissColor);
-                prevY = slotY + slotSize; // Only draw between the slots
-            }
-            if (prevY >= 0 && i / slotsPerRow == rows - 1) {
-                drawContext.fill(screenX, prevY, screenX + allSlotWidth, scaledHeight - 21, searchMissColor);
-                prevY = -1;
-            }
-            if (slotX > prevX) {
-                drawContext.fill(prevX, slotY, slotX, slotY + slotSize, searchMissColor);
-                prevX = slotX + slotSize; // Only draw between the slots
-            }
-            if (i + 1 == slotAmount || (slots.get(i + 1).y != slot.y && slots.get(i + 1).x != slot.x)) {
-                drawContext.fill(prevX, slotY, screenX + allSlotWidth, slotY + slotSize, searchMissColor);
-                prevX = screenX;
-            }
-        }
     }
 
     private static void init(Screen screen, int scaledWidth, int scaledHeight) {
