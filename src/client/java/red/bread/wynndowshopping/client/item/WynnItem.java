@@ -39,7 +39,7 @@ public class WynnItem {
     public Integer powderSlots;
     public String lore;
     public String dropRestriction;
-    public String restriction;
+    public String restrictions;
     public Boolean raidReward;
 
     public DropMeta dropMeta;
@@ -137,10 +137,13 @@ public class WynnItem {
         if (this.type.equals("material")) {
             result.add(Text.of("§7Crafting Material"));
         }
+        if (this.type.equals("charm")) {
+            result.add(Text.of("§8Active while on inventory"));
+        }
         if (this.attackSpeed != null) {
             result.add(Text.of("§7" + Utils.snakeToUpperCamelCaseWithSpaces(this.attackSpeed) + " Attack Speed"));
         }
-        if (base != null) {
+        if (base != null && !this.type.equals("charm")) {
             result.add(Text.empty());
             List<String> baseStatOrder = List.of("baseHealth", "baseEarthDefence", "baseThunderDefence", "baseWaterDefence", "baseFireDefence", "baseAirDefence", "baseDamage", "baseEarthDamage", "baseThunderDamage", "baseWaterDamage", "baseFireDamage", "baseAirDamage");
             for (String baseStatName : baseStatOrder) {
@@ -239,6 +242,7 @@ public class WynnItem {
                 result.add(Text.of(statPrefix + (!isNegative ? "+" : "") + identification.getValue().min + statRangePrefix + " to " + statPrefix + identification.getValue().max + statSuffix + " §7" + Utils.toUpperCamelCaseWithSpaces(statName)));
             }
         }
+
         if (majorIds != null) {
             for (Map.Entry<String, String> mid : majorIds.entrySet()) {
                 String majorIdDesc = "§b" + mid.getValue().replaceAll("<[^>]*>", "").replace(":", ":§3");
@@ -246,6 +250,22 @@ public class WynnItem {
                 for (String line : lengthLimitedStrings) {
                     result.add(Text.of("§3" + line));
                 }
+            }
+        }
+
+        if (type.equals("charm") && base != null) {
+            result.add(Text.empty());
+            if (base.containsKey("leveledLootBonus")) {
+                Identification stat = base.get("leveledLootBonus");
+                result.add(Text.of("§a+" + stat.min + " §2to §a" + stat.max + "% §7Loot from Lv. " + requirements.levelRange.min + "-" + requirements.levelRange.max + " content"));
+            }
+            if (base.containsKey("leveledXpBonus")) {
+                Identification stat = base.get("leveledXpBonus");
+                result.add(Text.of("§a+" + stat.min + " §2to §a" + stat.max + "% §7XP from Lv. " + requirements.levelRange.min + "-" + requirements.levelRange.max + " content"));
+            }
+            if (base.containsKey("damageFromMobs")) {
+                Identification stat = base.get("damageFromMobs");
+                result.add(Text.of("§c+" + stat.min + " §4to §c" + stat.max + "% §7Damage taken from mobs"));
             }
         }
 
@@ -310,6 +330,9 @@ public class WynnItem {
                 result.add(Text.empty());
                 result.add(Text.of("§c✖ §7" + getMaterialProfessionLabel() + " Lv. Min: " + requirements.level));
             }
+        }
+        if (restrictions != null) {
+            result.add(Text.of("§c" + Utils.toUpperCamelCaseWithSpaces(restrictions.replace(" item", "Item"))));
         }
         return result;
     }

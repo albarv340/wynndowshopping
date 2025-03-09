@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 import red.bread.wynndowshopping.client.item.WynnItem;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ItemStackBuilder {
         ComponentChanges.Builder builder = ComponentChanges.builder();
         builder.add(DataComponentTypes.CUSTOM_NAME, wynnItem.getFormattedDisplayName(name));
         builder.add(DataComponentTypes.LORE, new LoreComponent(wynnItem.getLore()));
+        builder.add(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE);
         try {
             ItemStack result = getBaseItem(wynnItem);
             result.applyChanges(builder.build());
