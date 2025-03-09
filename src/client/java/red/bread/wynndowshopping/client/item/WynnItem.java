@@ -202,19 +202,19 @@ public class WynnItem {
                 result.add(Text.of("§c✖ §7Combat Lv. Min: " + requirements.level));
             }
             if (requirements.strength > 0) {
-                result.add(Text.of("§c✖ §7Strength Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Strength Min: " + requirements.strength));
             }
             if (requirements.dexterity > 0) {
-                result.add(Text.of("§c✖ §7Dexterity Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Dexterity Min: " + requirements.dexterity));
             }
             if (requirements.intelligence > 0) {
-                result.add(Text.of("§c✖ §7Intelligence Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Intelligence Min: " + requirements.intelligence));
             }
             if (requirements.defence > 0) {
-                result.add(Text.of("§c✖ §7Defence Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Defence Min: " + requirements.defence));
             }
             if (requirements.agility > 0) {
-                result.add(Text.of("§c✖ §7Agility Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Agility Min: " + requirements.agility));
             }
         }
 
