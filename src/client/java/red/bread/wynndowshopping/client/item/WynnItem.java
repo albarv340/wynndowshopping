@@ -127,6 +127,13 @@ public class WynnItem {
         return "";
     }
 
+    private boolean isEffectivenessIngredient() {
+        if (!type.equals("ingredient")) {
+            return false;
+        }
+        return ingredientPositionModifiers.above + ingredientPositionModifiers.left + ingredientPositionModifiers.notTouching + ingredientPositionModifiers.touching + ingredientPositionModifiers.right + ingredientPositionModifiers.under != 0;
+    }
+
     public List<Text> getLore() {
         List<Text> result = new ArrayList<>();
         if (this.type.equals("ingredient")) {
@@ -291,6 +298,36 @@ public class WynnItem {
             result.add(Text.of(getNameFormatting() + Utils.toUpperCamelCaseWithSpaces(rarity) + " Item"));
         }
         if (type.equals("ingredient")) {
+            System.out.println(isEffectivenessIngredient());
+            System.out.println(internalName);
+            if (isEffectivenessIngredient()) {
+                result.add(Text.empty());
+                if (ingredientPositionModifiers.left != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.left < 0 ? "§c" : "§a+") + ingredientPositionModifiers.left + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients to the left of this one)"));
+                }
+                if (ingredientPositionModifiers.right != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.right < 0 ? "§c" : "§a+") + ingredientPositionModifiers.right + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients to the right of this one)"));
+                }
+                if (ingredientPositionModifiers.above != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.above < 0 ? "§c" : "§a+") + ingredientPositionModifiers.above + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients above this one)"));
+                }
+                if (ingredientPositionModifiers.under != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.under < 0 ? "§c" : "§a+") + ingredientPositionModifiers.under + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients below this one)"));
+                }
+                if (ingredientPositionModifiers.touching != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.touching < 0 ? "§c" : "§a+") + ingredientPositionModifiers.touching + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients touching this one)"));
+                }
+                if (ingredientPositionModifiers.notTouching != 0) {
+                    result.add(Text.of((ingredientPositionModifiers.notTouching < 0 ? "§c" : "§a+") + ingredientPositionModifiers.notTouching + "% §7Ingredient Effectiveness"));
+                    result.add(Text.of("§7(To ingredients not touching this one)"));
+                }
+
+            }
             result.add(Text.empty());
             if (consumableOnlyIDs != null && itemOnlyIDs != null) {
                 if (consumableOnlyIDs.duration != null && consumableOnlyIDs.duration != 0 && itemOnlyIDs.durabilityModifier != null && itemOnlyIDs.durabilityModifier != 0) {
