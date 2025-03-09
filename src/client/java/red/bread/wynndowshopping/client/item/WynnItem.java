@@ -6,9 +6,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import red.bread.wynndowshopping.client.util.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WynnItem {
     public String internalName;
@@ -206,7 +204,7 @@ public class WynnItem {
                 result.add(Text.of("§c✖ §7Intelligence Min: " + requirements.level));
             }
             if (requirements.defence > 0) {
-                result.add(Text.of("§c✖ §7Defense Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7Defence Min: " + requirements.level));
             }
             if (requirements.agility > 0) {
                 result.add(Text.of("§c✖ §7Agility Min: " + requirements.level));
@@ -215,11 +213,27 @@ public class WynnItem {
 
         if (identifications != null) {
             result.add(Text.empty());
+            List<String> rawSkillPoints = List.of("rawStrength", "rawDexterity", "rawIntelligence", "rawDefence", "rawAgility");
+            Set<String> iteratedKeys = new HashSet<>();
+
+            for (String key : rawSkillPoints) {
+                if (identifications.containsKey(key)) {
+                    Identification identification = identifications.get(key);
+                    boolean isNegative = identification.raw < 0;
+                    String statPrefix = isNegative ? "§c" : "§a+";
+                    result.add(Text.of(statPrefix + identification.raw + " §7" + Utils.toUpperCamelCaseWithSpaces(key.replace("raw", ""))));
+                    iteratedKeys.add(key);
+                }
+            }
+
             for (Map.Entry<String, Identification> identification : identifications.entrySet()) {
+                if (iteratedKeys.contains(identification.getKey())) {
+                    continue;
+                }
                 String statName = identification.getKey();
                 String statSuffix = "";
                 boolean isNegative = identification.getValue().raw < 0;
-                String statPrefix = isNegative ? "§c" : "§a";
+                String statPrefix = isNegative ? "§c" : "§a+";
                 String statRangePrefix = isNegative ? "§4" : "§2";
                 if (statName.startsWith("raw")) {
                     if (statName.equals("rawAttackSpeed")) {
@@ -239,7 +253,7 @@ public class WynnItem {
                         statSuffix = "%";
                     }
                 }
-                result.add(Text.of(statPrefix + (!isNegative ? "+" : "") + identification.getValue().min + statRangePrefix + " to " + statPrefix + identification.getValue().max + statSuffix + " §7" + Utils.toUpperCamelCaseWithSpaces(statName)));
+                result.add(Text.of(statPrefix + identification.getValue().min + statRangePrefix + " to " + statPrefix + identification.getValue().max + statSuffix + " §7" + Utils.toUpperCamelCaseWithSpaces(statName)));
             }
         }
 
