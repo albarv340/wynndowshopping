@@ -1,6 +1,18 @@
-package red.bread.wynndowshopping.client;
+package red.bread.wynndowshopping.client.util;
+
+import java.awt.*;
 
 public class Utils {
+    public static Color parseRGB(String rgbString) {
+        // Use regex to directly extract the numbers
+        String[] rgbValues = rgbString.replaceAll("\\s", ",").replaceAll("[^0-9,]", "").split(",");
+
+        // Return the Color object created from the parsed values
+        return new Color(Integer.parseInt(rgbValues[0]),
+                Integer.parseInt(rgbValues[1]),
+                Integer.parseInt(rgbValues[2]));
+    }
+
     public static double eval(final String str) {
         // Taken from https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form/
         return new Object() {

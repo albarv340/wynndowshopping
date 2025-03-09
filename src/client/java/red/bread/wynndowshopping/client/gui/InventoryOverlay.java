@@ -1,4 +1,4 @@
-package red.bread.wynndowshopping.client;
+package red.bread.wynndowshopping.client.gui;
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import red.bread.wynndowshopping.client.WynndowshoppingClient;
 
 import java.awt.*;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package red.bread.wynndowshopping.client;
+package red.bread.wynndowshopping.client.gui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;

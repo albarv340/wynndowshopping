@@ -1,4 +1,4 @@
-package red.bread.wynndowshopping.client;
+package red.bread.wynndowshopping.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -9,20 +9,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
+import red.bread.wynndowshopping.client.WynndowshoppingClient;
+import red.bread.wynndowshopping.client.item.WynnItem;
+import red.bread.wynndowshopping.client.util.ItemStackBuilder;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class InventoryRenderer {
     private static InventoryOverlay inventoryOverlay;
 
     public static void init(Screen screen, int scaledWidth, int scaledHeight) {
         List<ItemStack> items = new ArrayList<>();
-        for (int i = 1; i < 1000; i++) {
-            items.add(new ItemStack(RegistryEntry.of(Item.byRawId(i))));
+//        for (int i = 1; i < 1000; i++) {
+//            items.add(new ItemStack(RegistryEntry.of(Item.byRawId(i))));
+//        }
+        for (Map.Entry<String, WynnItem> wynnItem : WynndowshoppingClient.items.entrySet()) {
+            items.add(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()));
         }
         inventoryOverlay = new InventoryOverlay(items, screen, scaledWidth, scaledHeight, s -> {
             WynndowshoppingClient.currentSearchText = s;
@@ -39,7 +43,7 @@ public class InventoryRenderer {
         }
         updateHighlightedSlots();
         List<Slot> slots = client.player.currentScreenHandler.slots;
-        final int slotSize = 16;
+        final int slotSize = 18;
 
         final int searchMissColor = new Color(0, 0, 0, 150).getRGB();
         drawContext.getMatrices().push();
@@ -47,11 +51,11 @@ public class InventoryRenderer {
         int screenX = ((HandledScreen<?>) screen1).x;
         int screenY = ((HandledScreen<?>) screen1).y;
         highlightMatchingSLots(drawContext, slots, screenX, screenY, slotSize, searchMissColor);
+        drawContext.getMatrices().pop();
         if (inventoryOverlay.shouldRenderItems()) {
             inventoryOverlay.renderBackground(drawContext);
             inventoryOverlay.redraw();
         }
-        drawContext.getMatrices().pop();
     }
 
     private static void highlightMatchingSLots(DrawContext drawContext, List<Slot> slots, int screenX, int screenY, int slotSize, int searchMissColor) {
@@ -59,8 +63,8 @@ public class InventoryRenderer {
             return;
         }
         for (Slot slot : slots) {
-            int x = slot.x + screenX;
-            int y = slot.y + screenY;
+            int x = slot.x + screenX - 1;
+            int y = slot.y + screenY - 1;
             if (!highlightedSlots.contains(slot.id)) {
                 drawContext.fill(x, y, x + slotSize, y + slotSize, searchMissColor);
             }

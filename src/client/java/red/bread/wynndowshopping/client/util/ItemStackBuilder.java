@@ -1,0 +1,71 @@
+package red.bread.wynndowshopping.client.util;
+
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.datafixer.fix.ItemIdFix;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import red.bread.wynndowshopping.client.item.WynnItem;
+
+import java.util.List;
+import java.util.Map;
+
+public class ItemStackBuilder {
+    public static ItemStack buildItem(String name, WynnItem wynnItem) {
+        ComponentChanges.Builder builder = ComponentChanges.builder();
+        builder.add(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        try {
+            ItemStack result = getBaseItem(wynnItem);
+            result.applyChanges(builder.build());
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ItemStack placeholderItemStack = new ItemStack(RegistryEntry.of(Item.byRawId(2)));
+            placeholderItemStack.applyChanges(builder.build());
+            return placeholderItemStack;
+        }
+    }
+
+    private static ItemStack getBaseItem(WynnItem wynnItem) {
+        ItemStack result = new ItemStack(RegistryEntry.of(Item.byRawId(1)));
+        if (wynnItem.icon != null) {
+            switch (wynnItem.icon.format) {
+                case "attribute" -> {
+                    Map<String, String> value = wynnItem.icon.getMap();
+                    result = new ItemStack(Registries.ITEM.get(Identifier.of(value.get("id"))));
+                    result.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(Float.parseFloat(value.get("customModelData"))), List.of(), List.of(), List.of()));
+                }
+                case "legacy" -> {
+                    String[] materialArray = wynnItem.icon.getString().split(":");
+                    int itemTypeCode = Integer.parseInt(materialArray[0]);
+                    float damageCode = materialArray.length > 1 ? Float.parseFloat(materialArray[1]) : 0;
+                    result = new ItemStack(Registries.ITEM.get(Identifier.of(ItemIdFix.fromId(itemTypeCode))));
+                    if (result.toString().contains("minecraft:air")) {
+                        result = new ItemStack(Item.byRawId(itemTypeCode));
+                    }
+                    result.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(damageCode), List.of(), List.of(), List.of()));
+                }
+                case "skin" -> {
+                    result = new ItemStack(Registries.ITEM.get(Identifier.of("minecraft:player_head")));
+                    SkinUtils.setPlayerHeadFromUUID(result, wynnItem.icon.getString());
+                }
+            }
+        } else if (wynnItem.type.equals("armour")) {
+            String itemId = (wynnItem.armourMaterial.equals("chain") ? "chainmail" : wynnItem.armourMaterial) + "_" + wynnItem.armourType;
+            result = new ItemStack(Registries.ITEM.get(Identifier.of("minecraft:" + itemId)));
+            if (wynnItem.armourColor != null) {
+                result.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(Utils.parseRGB(wynnItem.armourColor).getRGB(), false));
+            }
+        }
+        if (result.toString().contains("minecraft:air")) {
+            result = new ItemStack(RegistryEntry.of(Item.byRawId(1)));
+        }
+        return result;
+    }
+}

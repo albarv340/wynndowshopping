@@ -1,9 +1,11 @@
-package red.bread.wynndowshopping.client;
+package red.bread.wynndowshopping.client.gui;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import red.bread.wynndowshopping.client.WynndowshoppingClient;
+import red.bread.wynndowshopping.client.util.Utils;
 
 import java.awt.*;
 import java.text.DecimalFormat;
