@@ -22,12 +22,10 @@ public class InventoryRenderer {
 
     public static void init(Screen screen, int scaledWidth, int scaledHeight) {
         List<ItemStack> items = new ArrayList<>();
-//        for (int i = 1; i < 1000; i++) {
-//            items.add(new ItemStack(RegistryEntry.of(Item.byRawId(i))));
-//        }
         for (Map.Entry<String, WynnItem> wynnItem : WynndowshoppingClient.items.entrySet()) {
             items.add(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()));
         }
+        items.sort(Comparator.comparing(o -> o.getName().getString()));
         inventoryOverlay = new InventoryOverlay(items, screen, scaledWidth, scaledHeight, s -> {
             WynndowshoppingClient.currentSearchText = s;
             updateHighlightedSlots();
