@@ -42,7 +42,7 @@ public class InventoryOverlay {
         this.onSearchFieldChange = onSearchFieldChange;
         this.scaledWidth = scaledWidth;
         this.scaledHeight = scaledHeight;
-        this.startX = scaledWidth / 2 + 119;
+        this.startX = Math.max(scaledWidth / 2 + 119, 3 * scaledWidth / 4);
         this.overlayWidth = (scaledWidth - startX);
         this.overlayHeight = scaledHeight - pageControlHeight;
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);

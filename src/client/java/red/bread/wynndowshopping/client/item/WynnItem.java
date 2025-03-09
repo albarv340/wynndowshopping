@@ -298,8 +298,6 @@ public class WynnItem {
             result.add(Text.of(getNameFormatting() + Utils.toUpperCamelCaseWithSpaces(rarity) + " Item"));
         }
         if (type.equals("ingredient")) {
-            System.out.println(isEffectivenessIngredient());
-            System.out.println(internalName);
             if (isEffectivenessIngredient()) {
                 result.add(Text.empty());
                 if (ingredientPositionModifiers.left != 0) {
