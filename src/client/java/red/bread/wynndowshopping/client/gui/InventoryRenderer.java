@@ -4,11 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
+import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.item.WynnItem;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
@@ -21,11 +20,11 @@ public class InventoryRenderer {
     private static InventoryOverlay inventoryOverlay;
 
     public static void init(Screen screen, int scaledWidth, int scaledHeight) {
-        List<ItemStack> items = new ArrayList<>();
+        List<Pair<ItemStack, WynnItem>> items = new ArrayList<>();
         for (Map.Entry<String, WynnItem> wynnItem : WynndowshoppingClient.items.entrySet()) {
-            items.add(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()));
+            items.add(new Pair<>(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()), wynnItem.getValue()));
         }
-        items.sort(Comparator.comparing(o -> o.getName().getString()));
+        items.sort(Comparator.comparing(o -> o.getA().getName().getString()));
         inventoryOverlay = new InventoryOverlay(items, screen, scaledWidth, scaledHeight, s -> {
             WynndowshoppingClient.currentSearchText = s;
             updateHighlightedSlots();

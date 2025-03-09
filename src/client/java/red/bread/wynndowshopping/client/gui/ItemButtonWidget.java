@@ -1,7 +1,5 @@
 package red.bread.wynndowshopping.client.gui;
 
-import java.awt.*;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -9,13 +7,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
+import red.bread.wynndowshopping.client.item.WynnItem;
 
 public class ItemButtonWidget extends ButtonWidget {
     ItemStack item;
+    WynnItem wynnItem;
 
-    public ItemButtonWidget(int x, int y, int slotSize, ItemStack item) {
+    public ItemButtonWidget(int x, int y, int slotSize, ItemStack item, WynnItem wynnItem) {
         super(x, y, slotSize, slotSize, Text.empty(), ButtonWidget::onPress, DEFAULT_NARRATION_SUPPLIER);
         this.item = item;
+        this.wynnItem = wynnItem;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class ItemButtonWidget extends ButtonWidget {
         int fillOpacity = hovered ? 0x6B000000 : 0x88000000;
         context.getMatrices().push();
         context.getMatrices().translate(0.0, 0.0, 160F);
-        context.fill(minX, minY, maxX, maxY, fillOpacity | Color.blue.getRGB());
+        context.fill(minX, minY, maxX, maxY, fillOpacity | wynnItem.getBackgroundColor());
         context.drawHorizontalLine(minX, maxX, minY, outlineColor);
         context.drawHorizontalLine(minX, maxX, maxY, outlineColor);
         context.drawVerticalLine(minX, minY, maxY, outlineColor);

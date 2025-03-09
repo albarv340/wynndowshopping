@@ -4,11 +4,11 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import red.bread.wynndowshopping.client.item.WynnItem;
 
@@ -18,7 +18,8 @@ import java.util.Map;
 public class ItemStackBuilder {
     public static ItemStack buildItem(String name, WynnItem wynnItem) {
         ComponentChanges.Builder builder = ComponentChanges.builder();
-        builder.add(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        builder.add(DataComponentTypes.CUSTOM_NAME, wynnItem.getFormattedDisplayName(name));
+        builder.add(DataComponentTypes.LORE, new LoreComponent(wynnItem.getLore()));
         try {
             ItemStack result = getBaseItem(wynnItem);
             result.applyChanges(builder.build());

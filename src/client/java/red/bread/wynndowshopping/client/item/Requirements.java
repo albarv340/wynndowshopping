@@ -7,6 +7,6 @@ public class Requirements {
     public LevelRange levelRange;
     public int strength, dexterity, intelligence, defence, agility;
     public String quest;
-    public String class_requirement;
+    public String classRequirement;
     public List<String> skills; // Uses custom deserializer
 }

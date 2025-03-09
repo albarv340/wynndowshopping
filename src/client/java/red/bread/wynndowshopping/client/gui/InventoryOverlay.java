@@ -9,7 +9,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
+import red.bread.wynndowshopping.client.item.WynnItem;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.function.Consumer;
 public class InventoryOverlay {
     private int currentPage = 1;
     private int totalPages = 1;
-    private final List<ItemStack> items;
+    private final List<Pair<ItemStack, WynnItem>> items;
     private final Screen screen;
     private final int scaledWidth;
     private final int scaledHeight;
@@ -34,7 +36,7 @@ public class InventoryOverlay {
     private final List<ClickableWidget> preExistingButtons;
 
 
-    InventoryOverlay(List<ItemStack> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
+    InventoryOverlay(List<Pair<ItemStack, WynnItem>> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
         this.items = items;
         this.screen = screen;
         this.onSearchFieldChange = onSearchFieldChange;
@@ -58,18 +60,19 @@ public class InventoryOverlay {
         Screens.getButtons(screen).add(searchTextFieldWidget);
         if (shouldRenderItems()) {
             final int itemsPerRow = overlayWidth / slotSize;
-            List<ItemStack> filteredItems = items.stream().filter(itemStack -> itemStack.getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
+            List<Pair<ItemStack, WynnItem>> filteredItems = items.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
             updatePageCounts(filteredItems.size());
             Screens.getButtons(screen).add(getPrevButton());
             Screens.getButtons(screen).add(getPageDisplayButton());
             Screens.getButtons(screen).add(getNextButton());
             final int itemsPerPage = getItemsPerPage();
-            List<ItemStack> currentPageItems = filteredItems.subList((currentPage -1) * itemsPerPage, Math.min(currentPage * itemsPerPage, filteredItems.size()));
+            List<Pair<ItemStack, WynnItem>> currentPageItems = filteredItems.subList((currentPage -1) * itemsPerPage, Math.min(currentPage * itemsPerPage, filteredItems.size()));
             for (int i = 0; i < currentPageItems.size(); i++) {
-                ItemStack itemStack = currentPageItems.get(i);
+                ItemStack itemStack = currentPageItems.get(i).getA();
+                WynnItem wynnItem = currentPageItems.get(i).getB();
                 int x = startX + slotSize * (i % itemsPerRow);
                 int y = pageControlHeight + (i / itemsPerRow) * slotSize;
-                Screens.getButtons(screen).add(new ItemButtonWidget(x, y, slotSize, itemStack));
+                Screens.getButtons(screen).add(new ItemButtonWidget(x, y, slotSize, itemStack, wynnItem));
             }
         } else {
             updatePageCounts(items.size());
