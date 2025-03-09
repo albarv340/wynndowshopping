@@ -6,10 +6,12 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,6 +30,7 @@ public class InventoryOverlay {
     private final int pageControlHeight = 40;
     private final int overlayWidth;
     private final int overlayHeight;
+    private final List<ClickableWidget> preExistingButtons;
 
 
     InventoryOverlay(List<ItemStack> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
@@ -40,6 +43,7 @@ public class InventoryOverlay {
         this.overlayWidth = (scaledWidth - startX);
         this.overlayHeight = scaledHeight - pageControlHeight;
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);
+        preExistingButtons = new ArrayList<>(Screens.getButtons(screen));
         updatePageCounts(items.size());
     }
 
@@ -49,6 +53,7 @@ public class InventoryOverlay {
         }
         hasChanged = false;
         Screens.getButtons(screen).clear();
+        Screens.getButtons(screen).addAll(preExistingButtons);
         Screens.getButtons(screen).add(searchTextFieldWidget);
         if (shouldRenderItems()) {
             final int itemsPerRow = overlayWidth / slotSize;
