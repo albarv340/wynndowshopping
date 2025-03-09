@@ -4,7 +4,6 @@ import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.datafixer.fix.ItemIdFix;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -42,14 +41,7 @@ public class ItemStackBuilder {
                     result.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(Float.parseFloat(value.get("customModelData"))), List.of(), List.of(), List.of()));
                 }
                 case "legacy" -> {
-                    String[] materialArray = wynnItem.icon.getString().split(":");
-                    int itemTypeCode = Integer.parseInt(materialArray[0]);
-                    float damageCode = materialArray.length > 1 ? Float.parseFloat(materialArray[1]) : 0;
-                    result = new ItemStack(Registries.ITEM.get(Identifier.of(ItemIdFix.fromId(itemTypeCode))));
-                    if (result.toString().contains("minecraft:air")) {
-                        result = new ItemStack(Item.byRawId(itemTypeCode));
-                    }
-                    result.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(damageCode), List.of(), List.of(), List.of()));
+                    result = new ItemStack(Registries.ITEM.get(Identifier.of("minecraft:" + Utils.legacyNameMap.getOrDefault(wynnItem.icon.getString(), "stone"))));
                 }
                 case "skin" -> {
                     result = new ItemStack(Registries.ITEM.get(Identifier.of("minecraft:player_head")));
