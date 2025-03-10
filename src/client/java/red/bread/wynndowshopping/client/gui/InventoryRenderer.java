@@ -24,7 +24,6 @@ public class InventoryRenderer {
         for (Map.Entry<String, WynnItem> wynnItem : WynndowshoppingClient.items.entrySet()) {
             items.add(new Pair<>(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()), wynnItem.getValue()));
         }
-        items.sort(Comparator.comparing(o -> o.getA().getName().getString()));
         inventoryOverlay = new InventoryOverlay(items, screen, scaledWidth, scaledHeight, s -> {
             WynndowshoppingClient.currentSearchText = s;
             updateHighlightedSlots();

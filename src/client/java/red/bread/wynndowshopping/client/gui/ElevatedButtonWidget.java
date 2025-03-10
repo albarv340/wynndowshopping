@@ -1,12 +1,17 @@
 package red.bread.wynndowshopping.client.gui;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
 public class ElevatedButtonWidget extends ButtonWidget {
     public ElevatedButtonWidget(int x, int y, int width, int height, Text text, PressAction onPress) {
         super(x, y, width, height, text, onPress, DEFAULT_NARRATION_SUPPLIER);
+    }
+    public ElevatedButtonWidget(int x, int y, int width, int height, Text text, Text tooltip, PressAction onPress) {
+        super(x, y, width, height, text, onPress, DEFAULT_NARRATION_SUPPLIER);
+        this.setTooltip(Tooltip.of(tooltip));
     }
 
     @Override

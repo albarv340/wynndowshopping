@@ -64,6 +64,76 @@ public class WynnItem {
         return this.rarity != null ? gearTierMap.getOrDefault(this.rarity, Formatting.WHITE) : Formatting.WHITE;
     }
 
+    public int getRarityValue() {
+        if (rarity == null) {
+            if (tier != null) {
+                switch (tier) {
+                    case "3" -> {
+                        return 8;
+                    }
+                    case "2" -> {
+                        return 9;
+                    }
+                    case "1" -> {
+                        return 10;
+                    }
+                    case "0" -> {
+                        return 11;
+                    }
+                }
+            }
+            return 100;
+        }
+        switch (rarity) {
+            case "mythic" -> {
+                return 0;
+            }
+            case "fabled" -> {
+                return 1;
+            }
+            case "legendary" -> {
+                return 2;
+            }
+            case "rare" -> {
+                return 3;
+            }
+            case "unique" -> {
+                return 4;
+            }
+            case "set" -> {
+                return 5;
+            }
+            case "normal" -> {
+                return 6;
+            }
+            default -> {
+                return 7;
+            }
+        }
+    }
+
+    public int getItemTypeValue() {
+        Map<String, Integer> itemValue = new HashMap<>();
+        int counter = 0;
+        itemValue.put("helmet", counter++);
+        itemValue.put("chestplate", counter++);
+        itemValue.put("leggings", counter++);
+        itemValue.put("boots", counter++);
+        itemValue.put("bow", counter++);
+        itemValue.put("dagger", counter++);
+        itemValue.put("relik", counter++);
+        itemValue.put("spear", counter++);
+        itemValue.put("wand", counter++);
+        itemValue.put("ring", counter++);
+        itemValue.put("bracelet", counter++);
+        itemValue.put("necklace", counter++);
+        itemValue.put("tome", counter++);
+        itemValue.put("charm", counter++);
+        itemValue.put("material", counter++);
+        itemValue.put("ingredient", counter++);
+        return  itemValue.getOrDefault(getItemTypeString(), 100);
+    }
+
     public int getBackgroundColor() {
         if (!this.type.equals("ingredient") && !this.type.equals("material")) {
             return getNameFormatting().getColorValue();
