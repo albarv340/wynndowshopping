@@ -21,6 +21,7 @@ public class IdentificationDeserializer implements JsonDeserializer<Map<String, 
             } else if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()) {
                 identifications.put(key, new Identification(value.getAsInt()));
             }
+            identifications.get(key).name = key;
         }
 
         return identifications;

@@ -22,6 +22,8 @@ public class WynnItem {
     public String armourColor;  // For armors
     public String attackSpeed;     // For weapons
     public Integer averageDps;     // For weapons
+    public String weaponType;     // For weapons
+    public String accessoryType;
     public Integer gatheringSpeed; // For tools
     public String tier;            // For ingredients and materials
     public String rarity;          // For normal items
@@ -134,6 +136,15 @@ public class WynnItem {
         return ingredientPositionModifiers.above + ingredientPositionModifiers.left + ingredientPositionModifiers.notTouching + ingredientPositionModifiers.touching + ingredientPositionModifiers.right + ingredientPositionModifiers.under != 0;
     }
 
+    private String getItemTypeString() {
+        return switch (type) {
+            case "armour" -> armourType;
+            case "weapon" -> weaponType;
+            case "accessory" -> accessoryType;
+            default -> type;
+        };
+    }
+
     public List<Text> getLore() {
         List<Text> result = new ArrayList<>();
         if (this.type.equals("ingredient")) {
@@ -225,10 +236,7 @@ public class WynnItem {
 
             for (String key : rawSkillPoints) {
                 if (identifications.containsKey(key)) {
-                    Identification identification = identifications.get(key);
-                    boolean isNegative = identification.raw < 0;
-                    String statPrefix = isNegative ? "§c" : "§a+";
-                    result.add(Text.of(statPrefix + identification.raw + " §7" + Utils.toUpperCamelCaseWithSpaces(key.replace("raw", ""))));
+                    result.add(Text.of(identifications.get(key).getFormattedStatString()));
                     iteratedKeys.add(key);
                 }
             }
@@ -237,30 +245,7 @@ public class WynnItem {
                 if (iteratedKeys.contains(identification.getKey())) {
                     continue;
                 }
-                String statName = identification.getKey();
-                String statSuffix = "";
-                boolean isNegative = identification.getValue().raw < 0;
-                String statPrefix = isNegative ? "§c" : "§a+";
-                String statRangePrefix = isNegative ? "§4" : "§2";
-                if (statName.startsWith("raw")) {
-                    if (statName.equals("rawAttackSpeed")) {
-                        statSuffix = " tier";
-                    }
-                    statName = statName.replace("raw", "");
-                } else if (statName.endsWith("Raw")) {
-                    statName = statName.replace("Raw", "");
-                } else if (statName.endsWith("poison")) {
-                    statSuffix = "/3s";
-                } else {
-                    if (statName.equals("manaRegen")) {
-                        statSuffix = "/5s";
-                    } else if (statName.equals("manaSteal") || statName.equals("lifeSteal")) {
-                        statSuffix = "/3s";
-                    } else {
-                        statSuffix = "%";
-                    }
-                }
-                result.add(Text.of(statPrefix + identification.getValue().min + statRangePrefix + " to " + statPrefix + identification.getValue().max + statSuffix + " §7" + Utils.toUpperCamelCaseWithSpaces(statName)));
+                result.add(Text.of(identification.getValue().getFormattedStatString()));
             }
         }
 
@@ -295,7 +280,7 @@ public class WynnItem {
             if (powderSlots != null) {
                 result.add(Text.of("§7[0/" + powderSlots + "] Powder Slots"));
             }
-            result.add(Text.of(getNameFormatting() + Utils.toUpperCamelCaseWithSpaces(rarity) + " Item"));
+            result.add(Text.of(getNameFormatting() + Utils.toUpperCamelCaseWithSpaces(rarity) + " " + Utils.toUpperCamelCaseWithSpaces(getItemTypeString())));
         }
         if (type.equals("ingredient")) {
             if (isEffectivenessIngredient()) {
