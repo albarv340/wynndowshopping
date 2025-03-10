@@ -103,8 +103,8 @@ public class InventoryOverlay {
 
     private void switchSorting() {
         this.sortingIndex = (sortingIndex + 1) % sortings.size();
-        // Always make sure items are secondarily sorted alphabetically
-        items.sort(Comparator.comparing(o -> o.getA().getName().getString()));
+        // Always make sure items are secondarily sorted by level
+        items.sort(Comparator.comparing(o -> -o.getB().requirements.level));
         switch (sortingIndex) {
             case 0 -> {
                 items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getItemTypeValue()));
