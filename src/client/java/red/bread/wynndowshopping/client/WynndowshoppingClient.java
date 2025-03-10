@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import red.bread.wynndowshopping.client.gui.InventoryRenderer;
 import red.bread.wynndowshopping.client.item.*;
@@ -17,6 +19,7 @@ public class WynndowshoppingClient implements ClientModInitializer {
     public static boolean cancelContainerClose = false;
     public static boolean highlightSearchedString = false;
     public static String currentSearchText = "";
+    public static boolean isInteractedWith = false;
     public static Map<String, WynnItem> items;
 
     @Override
@@ -25,6 +28,12 @@ public class WynndowshoppingClient implements ClientModInitializer {
             if (screen instanceof HandledScreen<?>) {
                 InventoryRenderer.init(screen, scaledWidth, scaledHeight);
                 ScreenEvents.afterRender(screen).register((screen1, drawContext, mouseX, mouseY, tickDelta) -> InventoryRenderer.render(screen1, client, drawContext, scaledWidth, scaledHeight));
+            }
+        });
+        ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
+            if (MinecraftClient.getInstance().currentScreen == null && isInteractedWith) {
+                // Hide the overlay if inventories are exited
+                isInteractedWith = false;
             }
         });
         updateItemsFromAPI();

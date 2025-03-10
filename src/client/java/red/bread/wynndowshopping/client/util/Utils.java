@@ -57,6 +57,28 @@ public class Utils {
         return result.toString();
     }
 
+    public static String spaceToUpperSnakeCase(String spaceSeparated) {
+        String[] words = spaceSeparated.split(" ");
+
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(word.substring(0, 1).toUpperCase())
+                        .append(word.substring(1).toLowerCase());
+                result.append("_");
+            }
+        }
+
+        if (!result.isEmpty()) {
+            result.setLength(result.length() - 1);  // Remove the last underscore
+        }
+
+        return result.toString();
+    }
+
+
+
     public static List<String> splitStringByLength(String input, int maxLength) {
         List<String> result = new ArrayList<>();
         int start = 0;

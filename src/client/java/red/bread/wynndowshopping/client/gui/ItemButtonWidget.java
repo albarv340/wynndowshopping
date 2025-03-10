@@ -2,12 +2,18 @@ package red.bread.wynndowshopping.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import red.bread.wynndowshopping.client.item.WynnItem;
+import red.bread.wynndowshopping.client.util.Utils;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class ItemButtonWidget extends ButtonWidget {
     ItemStack item;
@@ -19,10 +25,21 @@ public class ItemButtonWidget extends ButtonWidget {
         this.wynnItem = wynnItem;
     }
 
-    @Override
-    public void onClick(double mouseX, double mouseY) {
-    }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.active && this.visible && this.isMouseOver(mouseX, mouseY) && button == 1) {
+            this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+            try {
+                String formattedName = Utils.spaceToUpperSnakeCase(item.getName().getString().replaceAll("§.", "").replaceAll("\\[[^]]+]", "").trim());
+                String encodedName = URLEncoder.encode(formattedName, StandardCharsets.UTF_8);
+                ConfirmLinkScreen.open(MinecraftClient.getInstance().currentScreen, new URI("https://wynncraft.wiki.gg/wiki/" + encodedName));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {

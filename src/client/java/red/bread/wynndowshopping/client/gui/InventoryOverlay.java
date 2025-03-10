@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class InventoryOverlay {
-    private int currentPage = 1;
-    private int totalPages = 1;
-    private int sortingIndex = -1;
+    private static int currentPage = 1;
+    private static int totalPages = 1;
+    private static int sortingIndex = 0;
     private final List<Pair<ItemStack, WynnItem>> items;
     private final Screen screen;
     private final int scaledWidth;
@@ -52,7 +52,7 @@ public class InventoryOverlay {
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);
         preExistingButtons = new ArrayList<>(Screens.getButtons(screen));
         sortings = List.of(new Pair<>("Rarity", "By Rarity"), new Pair<>("A-Z", "Alphabetically"), new Pair<>("Lvl↑", "By Level Ascending"), new Pair<>("Lvl↓", "By Level Descending"), new Pair<>("Type", "By Type"));
-        switchSorting();
+        updateSort();
         updatePageCounts(items.size());
     }
 
@@ -92,7 +92,7 @@ public class InventoryOverlay {
     }
 
     public boolean shouldRenderItems() {
-        return searchTextFieldWidget.isInteractedWith;
+        return WynndowshoppingClient.isInteractedWith;
     }
 
     private int getItemsPerPage() {
@@ -102,7 +102,10 @@ public class InventoryOverlay {
     }
 
     private void switchSorting() {
-        this.sortingIndex = (sortingIndex + 1) % sortings.size();
+        sortingIndex = (sortingIndex + 1) % sortings.size();
+        updateSort();
+    }
+    private void updateSort() {
         // Always make sure items are secondarily sorted by level
         items.sort(Comparator.comparing(o -> -o.getB().requirements.level));
         switch (sortingIndex) {

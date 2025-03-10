@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 
 public class SearchTextFieldWidget extends TextFieldWidget {
     long lastClick = 0;
-    public boolean isInteractedWith = false;
     public SearchTextFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, Text text) {
         super(textRenderer, x, y, width, height, null, text);
     }
@@ -20,7 +19,7 @@ public class SearchTextFieldWidget extends TextFieldWidget {
     @Override
     public void onClick(double mouseX, double mouseY) {
         super.onClick(mouseX, mouseY);
-        isInteractedWith = true;
+        WynndowshoppingClient.isInteractedWith = true;
         if (System.currentTimeMillis() - lastClick < 200) {
             WynndowshoppingClient.highlightSearchedString = !WynndowshoppingClient.highlightSearchedString;
         }
