@@ -202,7 +202,7 @@ public class WynnItem {
             }
         }
         if (averageDps != null) {
-            result.add(Text.of("§8Average DPS: §7" + averageDps));
+            result.add(Text.of("   §8Average DPS: §7" + averageDps));
         }
         if (!type.equals("material") && !type.equals("ingredient")) {
             result.add(Text.empty());
