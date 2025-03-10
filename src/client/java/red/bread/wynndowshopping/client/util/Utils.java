@@ -59,11 +59,21 @@ public class Utils {
 
     public static List<String> splitStringByLength(String input, int maxLength) {
         List<String> result = new ArrayList<>();
-
-        for (int i = 0; i < input.length(); i += maxLength) {
-            result.add(input.substring(i, Math.min(i + maxLength, input.length())));
+        int start = 0;
+        while (start < input.length()) {
+            int end = Math.min(start + maxLength, input.length());
+            if (end < input.length() && input.charAt(end) != ' ') {
+                int lastSpaceIndex = input.lastIndexOf(' ', end);
+                if (lastSpaceIndex > start) {
+                    end = lastSpaceIndex;
+                }
+            }
+            result.add(input.substring(start, end));
+            start = end;
+            while (start < input.length() && input.charAt(start) == ' ') {
+                start++;
+            }
         }
-
         return result;
     }
 
