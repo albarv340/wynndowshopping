@@ -4,12 +4,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
-import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
-import red.bread.wynndowshopping.client.item.WynnItem;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
 
 import java.awt.*;
@@ -20,11 +17,7 @@ public class InventoryRenderer {
     private static InventoryOverlay inventoryOverlay;
 
     public static void init(Screen screen, int scaledWidth, int scaledHeight) {
-        List<Pair<ItemStack, WynnItem>> items = new ArrayList<>();
-        for (Map.Entry<String, WynnItem> wynnItem : WynndowshoppingClient.items.entrySet()) {
-            items.add(new Pair<>(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()), wynnItem.getValue()));
-        }
-        inventoryOverlay = new InventoryOverlay(items, screen, scaledWidth, scaledHeight, s -> {
+        inventoryOverlay = new InventoryOverlay(ItemStackBuilder.getAllItems(WynndowshoppingClient.items), screen, scaledWidth, scaledHeight, s -> {
             WynndowshoppingClient.currentSearchText = s;
             updateHighlightedSlots();
         });

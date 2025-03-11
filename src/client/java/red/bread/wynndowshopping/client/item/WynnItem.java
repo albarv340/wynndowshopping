@@ -1,6 +1,5 @@
 package red.bread.wynndowshopping.client.item;
 
-import com.google.gson.annotations.SerializedName;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -11,41 +10,42 @@ import java.util.*;
 public class WynnItem {
     public String internalName;
     public String type;
-    public String subType;
     public Icon icon;
-    public boolean identifier;
     public boolean allowCraftsman;
 
     // Type-dependent attributes
-    public String armourMaterial;  // For armors
-    public String armourType;  // For armors
-    public String armourColor;  // For armors
-    public String attackSpeed;     // For weapons
-    public Integer averageDps;     // For weapons
-    public String weaponType;     // For weapons
+    public String armourMaterial;
+    public String armourType;
+    public String armourColor;
+    public String attackSpeed;
+    public Integer averageDps;
+    public String weaponType;
     public String accessoryType;
-    public Integer gatheringSpeed; // For tools
-    public String tier;            // For ingredients and materials
-    public String rarity;          // For normal items
+    public Integer gatheringSpeed;
+    public String tier;
+    public String rarity;
 
-    public ConsumableOnlyIDs consumableOnlyIDs; // For ingredients
-    public IngredientPositionModifiers ingredientPositionModifiers; // For ingredients
-    public ItemOnlyIDs itemOnlyIDs; // For ingredients
-    public Map<String, String> majorIds; // Key-value pair of major IDs and descriptions
+    public ConsumableOnlyIDs consumableOnlyIDs;
+    public ItemOnlyIDs itemOnlyIDs;
+    public IngredientPositionModifiers ingredientPositionModifiers;
+    public List<String> craftable;
 
-    @SerializedName("craftable")
-    public List<String> craftable; // Can be a string or a list
+    public Map<String, Identification> base;
+    public Map<String, Identification> identifications;
+    public Requirements requirements;
+    public Map<String, String> majorIds;
+
 
     public Integer powderSlots;
     public String lore;
-    public String dropRestriction;
+
     public String restrictions;
     public Boolean raidReward;
 
+
     public DropMeta dropMeta;
-    public Map<String, Identification> base;
-    public Requirements requirements;
-    public Map<String, Identification> identifications;
+    public List<DroppedBy> droppedBy;
+    public String dropRestriction;
 
     private Formatting getNameFormatting() {
         final Map<String, Formatting> gearTierMap = Map.of(
@@ -180,7 +180,7 @@ public class WynnItem {
         return nameText;
     }
 
-    private String getMaterialProfessionLabel() {
+    public String getMaterialProfessionLabel() {
         if (!type.equals("material")) {
             return "";
         }

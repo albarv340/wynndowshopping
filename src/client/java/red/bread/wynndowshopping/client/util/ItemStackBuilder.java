@@ -11,12 +11,26 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.item.WynnItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ItemStackBuilder {
+
+    public static List<Pair<ItemStack, WynnItem>> getAllItems(Map<String, WynnItem> items) {
+        if (items == null) {
+            return null;
+        }
+        List<Pair<ItemStack, WynnItem>> itemStacks = new ArrayList<>();
+        for (Map.Entry<String, WynnItem> wynnItem : items.entrySet()) {
+            itemStacks.add(new Pair<>(ItemStackBuilder.buildItem(wynnItem.getKey(), wynnItem.getValue()), wynnItem.getValue()));
+        }
+        return itemStacks;
+    }
+
     public static ItemStack buildItem(String name, WynnItem wynnItem) {
         ComponentChanges.Builder builder = ComponentChanges.builder();
         builder.add(DataComponentTypes.CUSTOM_NAME, wynnItem.getFormattedDisplayName(name));

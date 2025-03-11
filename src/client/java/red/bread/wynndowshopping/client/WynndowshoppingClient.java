@@ -14,6 +14,7 @@ import red.bread.wynndowshopping.client.util.WebRequest;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class WynndowshoppingClient implements ClientModInitializer {
     public static boolean cancelContainerClose = false;
@@ -21,6 +22,7 @@ public class WynndowshoppingClient implements ClientModInitializer {
     public static String currentSearchText = "";
     public static boolean isInteractedWith = false;
     public static Map<String, WynnItem> items;
+    private static boolean isCurrentlyFetchingItemData = false;
 
     @Override
     public void onInitializeClient() {
@@ -39,10 +41,19 @@ public class WynndowshoppingClient implements ClientModInitializer {
         updateItemsFromAPI();
     }
 
-    private static void updateItemsFromAPI() {
+    public static void updateItemsFromAPI() {
+        updateItemsFromAPI(stringWynnItemMap -> {});
+    }
+
+    public static void updateItemsFromAPI(Consumer<Map<String, WynnItem>> callback) {
+        if (isCurrentlyFetchingItemData) {
+            return;
+        }
+        isCurrentlyFetchingItemData = true;
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(new TypeToken<Map<String, Identification>>() {
                 }.getType(), new IdentificationDeserializer())
+                .registerTypeAdapter(DroppedBy.class, new DroppedByDeserializer())
                 .create();
         new Thread(() -> {
             try {
@@ -50,6 +61,8 @@ public class WynndowshoppingClient implements ClientModInitializer {
                 Type type = new TypeToken<Map<String, WynnItem>>() {
                 }.getType();
                 items = gson.fromJson(allItemDataString, type);
+                isCurrentlyFetchingItemData = false;
+                callback.accept(items);
             } catch (Exception e) {
                 e.printStackTrace();
             }

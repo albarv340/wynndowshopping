@@ -1,7 +1,13 @@
 package red.bread.wynndowshopping.client.util;
 
 
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
+import net.minecraft.client.gui.screen.Screen;
+
 import java.awt.*;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +83,15 @@ public class Utils {
         return result.toString();
     }
 
+    public static void openURL(String itemName, Screen currentScreen) {
+        try {
+            String formattedName = Utils.spaceToUpperSnakeCase(itemName.replaceAll("§.", "").replaceAll("\\[[^]]+]", "").trim());
+            String encodedName = URLEncoder.encode(formattedName, StandardCharsets.UTF_8);
+            ConfirmLinkScreen.open(currentScreen, new URI("https://wynncraft.wiki.gg/wiki/" + encodedName));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public static List<String> splitStringByLength(String input, int maxLength) {

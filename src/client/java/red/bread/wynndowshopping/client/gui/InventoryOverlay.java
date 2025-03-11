@@ -9,9 +9,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.item.WynnItem;
+import red.bread.wynndowshopping.client.util.ItemStackBuilder;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,7 +25,8 @@ public class InventoryOverlay {
     private static int currentPage = 1;
     private static int totalPages = 1;
     private static int sortingIndex = 0;
-    private final List<Pair<ItemStack, WynnItem>> items;
+    @Nullable
+    private List<Pair<ItemStack, WynnItem>> items;
     private final Screen screen;
     private final int scaledWidth;
     private final int scaledHeight;
@@ -40,7 +43,7 @@ public class InventoryOverlay {
     private final List<Pair<String, String>> sortings;
 
 
-    InventoryOverlay(List<Pair<ItemStack, WynnItem>> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
+    InventoryOverlay(@Nullable List<Pair<ItemStack, WynnItem>> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
         this.items = items;
         this.screen = screen;
         this.onSearchFieldChange = onSearchFieldChange;
@@ -52,8 +55,10 @@ public class InventoryOverlay {
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);
         preExistingButtons = new ArrayList<>(Screens.getButtons(screen));
         sortings = List.of(new Pair<>("Rarity", "By Rarity"), new Pair<>("A-Z", "Alphabetically"), new Pair<>("Lvl↑", "By Level Ascending"), new Pair<>("Lvl↓", "By Level Descending"), new Pair<>("Type", "By Type"));
-        updateSort();
-        updatePageCounts(items.size());
+        if (items != null) {
+            updateSort();
+            updatePageCounts(items.size());
+        }
     }
 
     public void redraw() {
@@ -65,6 +70,16 @@ public class InventoryOverlay {
         Screens.getButtons(screen).addAll(preExistingButtons);
         Screens.getButtons(screen).add(searchTextFieldWidget);
         if (shouldRenderItems()) {
+            if (items == null) {
+                Screens.getButtons(screen).add(new ElevatedButtonWidget(startX, 0, overlayWidth, 20, Text.of("Error fetching items"), Text.of("Click here to retry"), button -> {
+                    button.setMessage(Text.of("Retrying..."));
+                    WynndowshoppingClient.updateItemsFromAPI(stringWynnItemMap -> {
+                        this.items = ItemStackBuilder.getAllItems(stringWynnItemMap);
+                        hasChanged = true;
+                    });
+                }));
+                return;
+            }
             final int itemsPerRow = overlayWidth / slotSize;
             List<Pair<ItemStack, WynnItem>> filteredItems = items.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
             updatePageCounts(filteredItems.size());
@@ -73,7 +88,7 @@ public class InventoryOverlay {
             Screens.getButtons(screen).add(getNextButton());
             Screens.getButtons(screen).addAll(getFilterButtons());
             final int itemsPerPage = getItemsPerPage();
-            List<Pair<ItemStack, WynnItem>> currentPageItems = filteredItems.subList((currentPage -1) * itemsPerPage, Math.min(currentPage * itemsPerPage, filteredItems.size()));
+            List<Pair<ItemStack, WynnItem>> currentPageItems = filteredItems.subList((currentPage - 1) * itemsPerPage, Math.min(currentPage * itemsPerPage, filteredItems.size()));
             for (int i = 0; i < currentPageItems.size(); i++) {
                 ItemStack itemStack = currentPageItems.get(i).getA();
                 WynnItem wynnItem = currentPageItems.get(i).getB();
@@ -81,7 +96,7 @@ public class InventoryOverlay {
                 int y = pageControlHeight + (i / itemsPerRow) * slotSize;
                 Screens.getButtons(screen).add(new ItemButtonWidget(x, y, slotSize, itemStack, wynnItem));
             }
-        } else {
+        } else if (items != null) {
             updatePageCounts(items.size());
         }
     }
@@ -105,18 +120,26 @@ public class InventoryOverlay {
         sortingIndex = (sortingIndex + 1) % sortings.size();
         updateSort();
     }
+
     private void updateSort() {
         // Always make sure items are secondarily sorted by level
+        if (items == null) {
+            return;
+        }
         items.sort(Comparator.comparing(o -> -o.getB().requirements.level));
         switch (sortingIndex) {
             case 0 -> {
                 items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getItemTypeValue()));
                 items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getRarityValue()));
             }
-            case 1 -> items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getA().getName().getString()));
-            case 2 -> items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().requirements.level));
-            case 3 -> items.sort(Comparator.comparing(itemStackWynnItemPair -> -itemStackWynnItemPair.getB().requirements.level));
-            case 4 -> items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getItemTypeValue()));
+            case 1 ->
+                    items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getA().getName().getString()));
+            case 2 ->
+                    items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().requirements.level));
+            case 3 ->
+                    items.sort(Comparator.comparing(itemStackWynnItemPair -> -itemStackWynnItemPair.getB().requirements.level));
+            case 4 ->
+                    items.sort(Comparator.comparing(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getItemTypeValue()));
         }
         hasChanged = true;
     }
@@ -149,7 +172,8 @@ public class InventoryOverlay {
     }
 
     private ElevatedButtonWidget getPageDisplayButton() {
-        return new ElevatedButtonWidget(startX + overlayWidth / 4, pageControlHeight / 4, overlayWidth / 2, pageControlHeight / 2, Text.of(String.format("Page %d/%d", currentPage, totalPages)), button -> {});
+        return new ElevatedButtonWidget(startX + overlayWidth / 4, pageControlHeight / 4, overlayWidth / 2, pageControlHeight / 2, Text.of(String.format("Page %d/%d", currentPage, totalPages)), button -> {
+        });
     }
 
     private List<ElevatedButtonWidget> getFilterButtons() {

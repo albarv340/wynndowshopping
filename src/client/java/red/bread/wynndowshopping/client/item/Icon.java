@@ -1,25 +1,26 @@
 package red.bread.wynndowshopping.client.item;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Icon {
     public Object value; // Can be a Map<String, String> or a String
     public String format;
 
-//    public String getId() {
-//        if (value instanceof Map) {
-//            Map<String, String> mapValue = (Map<String, String>) value;
-//            return mapValue.getOrDefault("id", null);
-//        } else if (value instanceof String) {
-//            return (String) value;
-//        }
-//        return null;
-//    }
-
     public Map<String, String> getMap() {
-        if (value instanceof Map) {
-            return (Map<String, String>) value;
+        if (value instanceof Map<?, ?> rawMap) {
+            Map<String, String> safeMap = new HashMap<>();
+
+            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
+                    safeMap.put((String) entry.getKey(), (String) entry.getValue());
+                } else {
+                    return null;
+                }
+            }
+            return safeMap;
         }
+
         return null;
     }
     public String getString() {
