@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import red.bread.wynndowshopping.client.gui.InventoryRenderer;
 import red.bread.wynndowshopping.client.item.*;
+import red.bread.wynndowshopping.client.util.ConfigFileUtil;
 import red.bread.wynndowshopping.client.util.WebRequest;
 
 import java.lang.reflect.Type;
@@ -42,7 +43,8 @@ public class WynndowshoppingClient implements ClientModInitializer {
     }
 
     public static void updateItemsFromAPI() {
-        updateItemsFromAPI(stringWynnItemMap -> {});
+        updateItemsFromAPI(stringWynnItemMap -> {
+        });
     }
 
     public static void updateItemsFromAPI(Consumer<Map<String, WynnItem>> callback) {
@@ -50,22 +52,32 @@ public class WynndowshoppingClient implements ClientModInitializer {
             return;
         }
         isCurrentlyFetchingItemData = true;
+        new Thread(() -> {
+            try {
+                String allItemDataString = WebRequest.getData("https://api.wynncraft.com/v3/item/database?fullResult");
+                items = parseAPIStringToItems(allItemDataString);
+                callback.accept(items);
+                if (items == null) {
+                    items = parseAPIStringToItems(ConfigFileUtil.readFile("all-wynncraft-items-backup.json"));
+                } else {
+                    ConfigFileUtil.writeFile("all-wynncraft-items-backup.json", allItemDataString);
+                }
+                isCurrentlyFetchingItemData = false;
+            } catch (Exception e) {
+                items = parseAPIStringToItems(ConfigFileUtil.readFile("all-wynncraft-items-backup.json"));
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private static Map<String, WynnItem> parseAPIStringToItems(String apiString) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(new TypeToken<Map<String, Identification>>() {
                 }.getType(), new IdentificationDeserializer())
                 .registerTypeAdapter(DroppedBy.class, new DroppedByDeserializer())
                 .create();
-        new Thread(() -> {
-            try {
-                String allItemDataString = WebRequest.getData("https://api.wynncraft.com/v3/item/database?fullResult");
-                Type type = new TypeToken<Map<String, WynnItem>>() {
-                }.getType();
-                items = gson.fromJson(allItemDataString, type);
-                isCurrentlyFetchingItemData = false;
-                callback.accept(items);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        Type type = new TypeToken<Map<String, WynnItem>>() {
+        }.getType();
+        return gson.fromJson(apiString, type);
     }
 }
