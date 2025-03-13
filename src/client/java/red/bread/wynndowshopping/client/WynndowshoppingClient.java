@@ -14,7 +14,9 @@ import red.bread.wynndowshopping.client.util.ConfigFileUtil;
 import red.bread.wynndowshopping.client.util.WebRequest;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class WynndowshoppingClient implements ClientModInitializer {
@@ -23,6 +25,7 @@ public class WynndowshoppingClient implements ClientModInitializer {
     public static String currentSearchText = "";
     public static boolean isInteractedWith = false;
     public static Map<String, WynnItem> items;
+    public static Map<String, Set<String>> possibleFilters = new HashMap<>();
     private static boolean isCurrentlyFetchingItemData = false;
 
     @Override
@@ -72,6 +75,8 @@ public class WynndowshoppingClient implements ClientModInitializer {
 
     private static Map<String, WynnItem> parseAPIStringToItems(String apiString) {
         Gson gson = new GsonBuilder()
+                .registerTypeAdapter(new TypeToken<Map<String, WynnItem>>() {
+                }.getType(), new WynnItemDeserializer())
                 .registerTypeAdapter(new TypeToken<Map<String, Identification>>() {
                 }.getType(), new IdentificationDeserializer())
                 .registerTypeAdapter(DroppedBy.class, new DroppedByDeserializer())

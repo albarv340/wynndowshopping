@@ -215,6 +215,10 @@ public class WynnItem {
         };
     }
 
+    public boolean isOfType(String typeString) {
+        return getItemTypeString().equals(typeString) || type.equals(typeString);
+    }
+
     public List<Text> getLore() {
         List<Text> result = new ArrayList<>();
         if (this.type.equals("ingredient")) {

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.item.WynnItem;
+import red.bread.wynndowshopping.client.util.Filter;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
 
 import java.awt.*;
@@ -41,6 +42,7 @@ public class InventoryOverlay {
     private final int overlayHeight;
     private final List<ClickableWidget> preExistingButtons;
     private final List<Pair<String, String>> sortings;
+    private static final ItemFilterGuiScreen itemFilterGuiScreen = new ItemFilterGuiScreen();
 
 
     InventoryOverlay(@Nullable List<Pair<ItemStack, WynnItem>> items, Screen screen, int scaledWidth, int scaledHeight, Consumer<String> onSearchFieldChange) {
@@ -81,7 +83,7 @@ public class InventoryOverlay {
                 return;
             }
             final int itemsPerRow = overlayWidth / slotSize;
-            List<Pair<ItemStack, WynnItem>> filteredItems = items.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
+            List<Pair<ItemStack, WynnItem>> filteredItems = getFilteredItems();
             updatePageCounts(filteredItems.size());
             Screens.getButtons(screen).add(getPrevButton());
             Screens.getButtons(screen).add(getPageDisplayButton());
@@ -119,6 +121,28 @@ public class InventoryOverlay {
     private void switchSorting() {
         sortingIndex = (sortingIndex + 1) % sortings.size();
         updateSort();
+    }
+
+    private List<Pair<ItemStack, WynnItem>> getFilteredItems() {
+        List<Pair<ItemStack, WynnItem>> filteredItems = new ArrayList<>();
+        if (items == null) {
+            return filteredItems;
+        }
+        filteredItems = items.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
+        for (Filter filter : itemFilterGuiScreen.getItemFilters()) {
+            if (filter.value.isEmpty()) {
+                continue;
+            }
+            switch (filter.getOption()) {
+                case "type" -> {
+                    switch (filter.comparator) {
+                        case EXISTS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
+                        case NOT_EXISTS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
+                    }
+                    }
+            }
+        }
+        return filteredItems;
     }
 
     private void updateSort() {
@@ -181,6 +205,13 @@ public class InventoryOverlay {
         final int y = scaledHeight - 3 * filterHeight / 4;
         filterButtons.add(new ElevatedButtonWidget(startX, y, 40, 20, Text.of(sortings.get(sortingIndex).getA()), Text.of("Sort " + sortings.get(sortingIndex).getB()), button -> {
             switchSorting();
+        }));
+        filterButtons.add(new ElevatedButtonWidget(scaledWidth - 120, y, 80, 20, Text.of("Clear Filters"), Text.of("Clear Filters"), button -> {
+            itemFilterGuiScreen.clearFilters();
+            hasChanged = true;
+        }));
+        filterButtons.add(new ElevatedButtonWidget(scaledWidth - 40, y, 40, 20, Text.of("Filters"), Text.of("Open Filter Menu"), button -> {
+            itemFilterGuiScreen.open(screen);
         }));
         return filterButtons;
     }
