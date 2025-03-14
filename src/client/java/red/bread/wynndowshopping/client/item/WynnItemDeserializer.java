@@ -6,6 +6,7 @@ import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 
@@ -23,6 +24,7 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
         WynndowshoppingClient.possibleFilters.put("restriction", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("majorId", new HashSet<>());
         WynndowshoppingClient.possibleFilters.get("majorId").add("any");
+        WynndowshoppingClient.possibleFilters.get("identification").addAll(List.of("durabilityModifier", "strengthRequirement", "dexterityRequirement", "intelligenceRequirement", "defenceRequirement", "agilityRequirement", "duration", "charges", "ingredientEffectiveness"));
 
         JsonObject obj = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
