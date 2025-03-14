@@ -1,5 +1,6 @@
 package red.bread.wynndowshopping.client.gui;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -31,6 +32,8 @@ public class ItemFilterGuiScreen extends Screen {
     private final ArrayList<ElevatedButtonWidget> filterListDelete;
 
     private final ArrayList<Filter> itemFilters = new ArrayList<>();
+    public int levelMin = 0;
+    public int levelMax = 110;
 
     private int removeIndex = -1;
 
@@ -53,7 +56,12 @@ public class ItemFilterGuiScreen extends Screen {
 
     public void postInit() {
         backButton = new ElevatedButtonWidget(5, 5, 30, 20, Text.literal("Back"), Text.of("Go Back"), (button) -> close());
-
+        NumberTextFieldWidget levelMinField = new NumberTextFieldWidget(textRenderer, 115, 5, 30, 20, levelMin, integer -> levelMin = integer);
+        levelMinField.setTooltip(Tooltip.of(Text.of("Minimum")));
+        NumberTextFieldWidget levelMaxField = new NumberTextFieldWidget(textRenderer, 155, 5, 30, 20, levelMax, integer -> levelMax = integer);
+        levelMaxField.setTooltip(Tooltip.of(Text.of("Maximum")));
+        Screens.getButtons(this).add(levelMinField);
+        Screens.getButtons(this).add(levelMaxField);
         addFilterButton = ButtonWidget.builder(Text.literal("Add New Filter"), (button) -> {
             int index = filterListOption.size();
 
@@ -113,6 +121,8 @@ public class ItemFilterGuiScreen extends Screen {
         filterListConstant.clear();
         filterListDelete.clear();
         itemFilters.clear();
+        levelMin = 0;
+        levelMax = 110;
 
         updateFilterListPositions();
     }
@@ -136,7 +146,8 @@ public class ItemFilterGuiScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
+//        this.renderBackground(context, mouseX, mouseY, delta);
 
         // draw filter buttons and stuff
         boolean anyOpen = false;
@@ -179,6 +190,8 @@ public class ItemFilterGuiScreen extends Screen {
         context.fill(0, 0, width, labelMenuHeight, 0xFF555555);
         context.drawHorizontalLine(0, width, labelMenuHeight, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, Text.literal("Item Filters").setStyle(Style.EMPTY.withBold(true)), width / 2, (labelMenuHeight - textRenderer.fontHeight) / 2, 0xFFFFAA00);
+        context.drawTextWithShadow(textRenderer, Text.of("Level Range"), 50, (labelMenuHeight - textRenderer.fontHeight) / 2 + 1, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, Text.of("-"), 148, (labelMenuHeight - textRenderer.fontHeight) / 2 + 1, 0xFFFFFFFF);
         context.getMatrices().pop();
 
         // draw gui elements

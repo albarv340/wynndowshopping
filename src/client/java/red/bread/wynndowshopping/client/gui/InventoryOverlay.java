@@ -128,7 +128,8 @@ public class InventoryOverlay {
         if (items == null) {
             return filteredItems;
         }
-        filteredItems = items.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
+        filteredItems = items.stream().filter(itemStack -> itemStack.getB().requirements.level >= itemFilterGuiScreen.levelMin && itemStack.getB().requirements.level <= itemFilterGuiScreen.levelMax).toList();
+        filteredItems = filteredItems.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
         for (Filter filter : itemFilterGuiScreen.getItemFilters()) {
             if (filter.value.isEmpty()) {
                 continue;
@@ -262,14 +263,14 @@ public class InventoryOverlay {
     private List<ElevatedButtonWidget> getFilterButtons() {
         List<ElevatedButtonWidget> filterButtons = new ArrayList<>();
         final int y = scaledHeight - 3 * filterHeight / 4;
-        filterButtons.add(new ElevatedButtonWidget(startX, y, 40, 20, Text.of(sortings.get(sortingIndex).getA()), Text.of("Sort " + sortings.get(sortingIndex).getB()), button -> {
+        filterButtons.add(new ElevatedButtonWidget(startX, y, overlayWidth / 4, 20, Text.of(sortings.get(sortingIndex).getA()), Text.of("Sort " + sortings.get(sortingIndex).getB()), button -> {
             switchSorting();
         }));
-        filterButtons.add(new ElevatedButtonWidget(scaledWidth - 120, y, 80, 20, Text.of("Clear Filters"), Text.of("Clear Filters"), button -> {
+        filterButtons.add(new ElevatedButtonWidget(startX + overlayWidth / 4, y, overlayWidth / 2, 20, Text.of("Clear Filters"), Text.of("Clear Filters"), button -> {
             itemFilterGuiScreen.clearFilters();
             hasChanged = true;
         }));
-        filterButtons.add(new ElevatedButtonWidget(scaledWidth - 40, y, 40, 20, Text.of("Filters"), Text.of("Open Filter Menu"), button -> {
+        filterButtons.add(new ElevatedButtonWidget(scaledWidth - overlayWidth / 4, y, overlayWidth / 4, 20, Text.of("Filters"), Text.of("Open Filter Menu"), button -> {
             itemFilterGuiScreen.open(screen);
         }));
         return filterButtons;
