@@ -16,11 +16,12 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
         Map<String, WynnItem> items = new HashMap<>();
         WynndowshoppingClient.possibleFilters.put("type", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("rarity", new HashSet<>());
+        WynndowshoppingClient.possibleFilters.put("tier", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("identification", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("base", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("restriction", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("majorId", new HashSet<>());
-
+        WynndowshoppingClient.possibleFilters.get("majorId").add("any");
 
         JsonObject obj = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
@@ -28,6 +29,7 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
             JsonElement value = entry.getValue();
             WynnItem wynnItem = context.deserialize(value, WynnItem.class);
             items.put(key, wynnItem);
+            wynnItem.name = key;
             if (wynnItem.identifications != null) {
                 for (String identification : wynnItem.identifications.keySet()) {
                     WynndowshoppingClient.possibleFilters.get("identification").add(identification);
@@ -42,6 +44,9 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
                 for (String identification : wynnItem.majorIds.keySet()) {
                     WynndowshoppingClient.possibleFilters.get("majorId").add(identification);
                 }
+            }
+            if (wynnItem.tier != null) {
+                WynndowshoppingClient.possibleFilters.get("tier").add(wynnItem.tier);
             }
             if (wynnItem.rarity != null) {
                 WynndowshoppingClient.possibleFilters.get("rarity").add(wynnItem.rarity);

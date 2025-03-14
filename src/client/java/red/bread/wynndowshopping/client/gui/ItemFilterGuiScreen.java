@@ -74,19 +74,18 @@ public class ItemFilterGuiScreen extends Screen {
                         }
                 ));
 
-            }).position(280, labelMenuHeight + 5 + index * 25).size(60, 20).tooltip(Tooltip.of(Text.literal("Click to cycle"))).build();
+            }).position(380, labelMenuHeight + 5 + index * 25).size(60, 20).tooltip(Tooltip.of(Text.literal("Click to cycle"))).build();
 
-            DropdownWidget valueWidget = new DropdownWidget(textRenderer, 125, labelMenuHeight + 7 + index * 25, 150, Text.literal(""), "", List.of(), (v) -> {
+            DropdownWidget valueWidget = new DropdownWidget(textRenderer, 125, labelMenuHeight + 7 + index * 25, 250, Text.literal(""), "", List.of(), (v) -> {
                 filter.value = v;
             });
-            TextFieldWidget constant = new TextFieldWidget(textRenderer, 345, labelMenuHeight + 8 + index * 25, 30, 14, Text.literal(""));
+            TextFieldWidget constant = new TextFieldWidget(textRenderer, 445, labelMenuHeight + 8 + index * 25, 50, 20, Text.literal(""));
             constant.setText("0");
+            constant.setTooltip(Tooltip.of(Text.of("Compared to the raw value")));
             constant.setChangedListener(c -> {
                 try {
-                    filter.constant = Double.parseDouble(c);
-                } catch (Exception e) {
-                    // error handling is stupid
-                }
+                    filter.constant = Integer.parseInt(c);
+                } catch (Exception ignored) {}
             });
             DropdownWidget options = new DropdownWidget(textRenderer, 30, labelMenuHeight + 7 + index * 25, 90, Text.literal(""), "Select Sort Type", WynndowshoppingClient.possibleFilters.keySet().stream().toList(), (v) -> {
                 filter.setOption(v);
@@ -125,7 +124,7 @@ public class ItemFilterGuiScreen extends Screen {
             filterListOption.forEach(i -> i.setY(labelMenuHeight + 8 + filterListOption.indexOf(i) * 25));
             filterListValue.forEach(i -> i.setY(labelMenuHeight + 8 + filterListValue.indexOf(i) * 25));
             filterListComparator.forEach(i -> i.setY(labelMenuHeight + 5 + filterListComparator.indexOf(i) * 25));
-            filterListConstant.forEach(i -> i.setY(labelMenuHeight + 8 + filterListConstant.indexOf(i) * 25));
+            filterListConstant.forEach(i -> i.setY(labelMenuHeight + 5 + filterListConstant.indexOf(i) * 25));
             filterListDelete.forEach(i -> i.setY(labelMenuHeight + 5 + filterListDelete.indexOf(i) * 25));
             //filterListDuplicate.forEach(i -> i.y = labelMenuHeight + 5 + filterListDuplicate.indexOf(i) * 25);
 //        }
@@ -156,7 +155,7 @@ public class ItemFilterGuiScreen extends Screen {
                 v.renderMain(context, mouseX, mouseY, delta);
         }
         for (TextFieldWidget c : filterListConstant) {
-            if (filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("Stat") && !(itemFilters.get(filterListConstant.indexOf(c)).comparator.ordinal() < Comparator.NOT_EXISTS.ordinal()))
+            if ((filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("identification") || filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("base")) && !(itemFilters.get(filterListConstant.indexOf(c)).comparator.ordinal() <= Comparator.NOT_EXISTS.ordinal()))
                 c.render(context, mouseX, mouseY, delta);
         }
         for (ButtonWidget c : filterListComparator) {
@@ -219,8 +218,11 @@ public class ItemFilterGuiScreen extends Screen {
                 c.mouseClicked(mouseX, mouseY, button);
         }
         for (TextFieldWidget c : filterListConstant) {
-            if (filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("Stat") && !(itemFilters.get(filterListConstant.indexOf(c)).comparator.ordinal() < Comparator.NOT_EXISTS.ordinal()))
-                c.mouseClicked(mouseX, mouseY, button);
+            if ((filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("identification") || filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("base")) && !(itemFilters.get(filterListConstant.indexOf(c)).comparator.ordinal() <= Comparator.NOT_EXISTS.ordinal())) {
+                System.out.println("clicked constant");
+                c.setFocused(c.isMouseOver(mouseX, mouseY));
+//                c.mouseClicked(mouseX, mouseY, button);
+            }
         }
         filterListDelete.forEach(i -> i.mouseClicked(mouseX, mouseY, button));
         //filterListDuplicate.forEach(i -> i.mouseClicked(mouseX, mouseY, button));

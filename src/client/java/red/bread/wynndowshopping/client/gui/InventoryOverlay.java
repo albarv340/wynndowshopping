@@ -136,10 +136,58 @@ public class InventoryOverlay {
             switch (filter.getOption()) {
                 case "type" -> {
                     switch (filter.comparator) {
-                        case EXISTS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
-                        case NOT_EXISTS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().isOfType(filter.value)).toList();
                     }
+                }
+                case "rarity" -> {
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().rarity != null && itemStackWynnItemPair.getB().rarity.equals(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().rarity != null && !itemStackWynnItemPair.getB().rarity.equals(filter.value)).toList();
                     }
+                }
+                case "tier" -> {
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().tier != null && itemStackWynnItemPair.getB().tier.equals(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().tier != null && !itemStackWynnItemPair.getB().tier.equals(filter.value)).toList();
+                    }
+                }
+                case "restriction" -> {
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().restrictions != null && itemStackWynnItemPair.getB().restrictions.equals(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().restrictions != null && !itemStackWynnItemPair.getB().restrictions.equals(filter.value)).toList();
+                    }
+                }
+                case "majorId" -> {
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasMajorId(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().hasMajorId(filter.value)).toList();
+                    }
+                }
+                case "identification", "base" -> {
+                    System.out.println(filter.constant);
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().hasIdentification(filter.value)).toList();
+                        case LT -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) < filter.constant).toList();
+                        case LTE -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) <= filter.constant).toList();
+                        case GT -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) > filter.constant).toList();
+                        case GTE -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) >= filter.constant).toList();
+                        case EQUALS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) == filter.constant).toList();
+                    }
+                }
             }
         }
         return filteredItems;

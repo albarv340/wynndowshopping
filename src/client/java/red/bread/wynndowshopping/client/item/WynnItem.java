@@ -8,6 +8,7 @@ import red.bread.wynndowshopping.client.util.Utils;
 import java.util.*;
 
 public class WynnItem {
+    public String name;
     public String internalName;
     public String type;
     public Icon icon;
@@ -21,6 +22,7 @@ public class WynnItem {
     public Integer averageDps;
     public String weaponType;
     public String accessoryType;
+    public String toolType;
     public Integer gatheringSpeed;
     public String tier;
     public String rarity;
@@ -199,11 +201,34 @@ public class WynnItem {
         return "";
     }
 
+    private String getToolProfessionLabel() {
+        if (!type.equals("tool")) {
+            return "";
+        }
+        if (toolType.equals("axe")) {
+            return "§f" + Utils.getProfessionIcon("woodcutting") + "§7 Woodcutting";
+        }
+        if (toolType.equals("scythe")) {
+            return "§f" + Utils.getProfessionIcon("farming") + "§7 Farming";
+        }
+        if (toolType.equals("rod")) {
+            return "§f" + Utils.getProfessionIcon("fishing") + "§7 Fishing";
+        }
+        if (toolType.equals("pickaxe")) {
+            return "§f" + Utils.getProfessionIcon("mining") + "§7 Mining";
+        }
+        return "";
+    }
+
     private boolean isEffectivenessIngredient() {
         if (!type.equals("ingredient")) {
             return false;
         }
-        return ingredientPositionModifiers.above + ingredientPositionModifiers.left + ingredientPositionModifiers.notTouching + ingredientPositionModifiers.touching + ingredientPositionModifiers.right + ingredientPositionModifiers.under != 0;
+        return getTotalIngredientEffectiveness() != 0;
+    }
+
+    private int getTotalIngredientEffectiveness() {
+        return ingredientPositionModifiers.above + ingredientPositionModifiers.left + ingredientPositionModifiers.notTouching + ingredientPositionModifiers.touching + ingredientPositionModifiers.right + ingredientPositionModifiers.under;
     }
 
     private String getItemTypeString() {
@@ -217,6 +242,50 @@ public class WynnItem {
 
     public boolean isOfType(String typeString) {
         return getItemTypeString().equals(typeString) || type.equals(typeString);
+    }
+
+    public int getRawIdentificationValue(String identification) {
+        int res = 0;
+        if (identifications != null) {
+            if (identifications.containsKey(identification)) {
+                res = identifications.get(identification).raw;
+            }
+        }
+        if (base != null) {
+            if (base.containsKey(identification)) {
+                res = base.get(identification).raw;
+            }
+        }
+        switch (identification) {
+            case "durabilityModifier" -> res = (itemOnlyIDs.durabilityModifier != null && itemOnlyIDs.durabilityModifier != 0) ? itemOnlyIDs.durabilityModifier : res;
+            case "strengthRequirement" -> res = (itemOnlyIDs.strengthRequirement != null && itemOnlyIDs.strengthRequirement != 0) ? itemOnlyIDs.strengthRequirement : res;
+            case "dexterityRequirement" -> res = (itemOnlyIDs.dexterityRequirement != null && itemOnlyIDs.dexterityRequirement != 0) ? itemOnlyIDs.dexterityRequirement: res;
+            case "intelligenceRequirement" -> res = (itemOnlyIDs.intelligenceRequirement != null && itemOnlyIDs.intelligenceRequirement != 0) ? itemOnlyIDs.intelligenceRequirement: res;
+            case "defenceRequirement" -> res = (itemOnlyIDs.defenceRequirement != null && itemOnlyIDs.defenceRequirement != 0) ? itemOnlyIDs.defenceRequirement: res;
+            case "agilityRequirement" -> res = (itemOnlyIDs.agilityRequirement != null && itemOnlyIDs.agilityRequirement != 0) ? itemOnlyIDs.agilityRequirement: res;
+            case "duration" -> res = (consumableOnlyIDs.duration != null && consumableOnlyIDs.duration != 0) ? consumableOnlyIDs.duration: res;
+            case "charges" -> res = (consumableOnlyIDs.charges != null && consumableOnlyIDs.charges != 0) ? consumableOnlyIDs.charges: res;
+            case "ingredientEffectiveness" -> res = isEffectivenessIngredient() ? getTotalIngredientEffectiveness() : res;
+        }
+        if (res != 0) {
+            System.out.println(internalName);
+            System.out.println(res);
+        }
+        return res;
+    }
+
+    public boolean hasIdentification(String identification) {
+        return getRawIdentificationValue(identification) != 0;
+    }
+
+    public boolean hasMajorId(String majorId) {
+        if (majorIds != null) {
+            if (majorId.equals("any")) {
+                return true;
+            }
+            return majorIds.containsKey(majorId);
+        }
+        return false;
     }
 
     public List<Text> getLore() {
@@ -278,7 +347,7 @@ public class WynnItem {
         if (averageDps != null) {
             result.add(Text.of("   §8Average DPS: §7" + averageDps));
         }
-        if (!type.equals("material") && !type.equals("ingredient")) {
+        if (!type.equals("material") && !type.equals("ingredient") && !type.equals("tool")) {
             result.add(Text.empty());
             if (requirements.classRequirement != null) {
                 result.add(Text.of("§c✖ §7Class Req: " + Utils.toUpperCamelCaseWithSpaces(requirements.classRequirement)));
@@ -438,6 +507,10 @@ public class WynnItem {
                 result.add(Text.empty());
                 result.add(Text.of("§c✖ §7" + getMaterialProfessionLabel() + " Lv. Min: " + requirements.level));
             }
+        }
+        if (type.equals("tool")) {
+            result.add(Text.of("§6Gathering Speed: " + gatheringSpeed));
+            result.add(Text.of("§c✖ §7" + getToolProfessionLabel() + "Lv. Min: " + requirements.level));
         }
         if (restrictions != null) {
             result.add(Text.of("§c" + Utils.toUpperCamelCaseWithSpaces(restrictions.replace(" item", "Item"))));

@@ -4,7 +4,7 @@ public class Filter {
     private String option;
     public String value;
     public Comparator comparator;
-    public double constant;
+    public int constant;
 
     // comparator info:
     // 0 -> Exists
@@ -19,14 +19,7 @@ public class Filter {
         this.option = "";
         this.value = "";
         this.comparator = Comparator.EXISTS;
-        this.constant = 0.0;
-    }
-
-    public Filter(String option, String value, Comparator comparator, double constant) {
-        this.option = option;
-        this.value = value;
-        this.comparator = comparator;
-        this.constant = constant;
+        this.constant = 0;
     }
 
     public void setOption(String option) {
@@ -40,12 +33,9 @@ public class Filter {
     }
 
     public void incrementComparator() {
-        comparator = Comparator.values()[comparator.ordinal() + 1];
-        if (option.equals("Stat")) {
+        comparator = comparator.ordinal() < Comparator.values().length - 1 ? Comparator.values()[comparator.ordinal() + 1] : Comparator.EXISTS;
+        if (option.equals("identification") || option.equals("base")) {
             if (comparator.ordinal() > Comparator.LT.ordinal()) comparator = Comparator.EXISTS;
-        } else if (option.equals("Charm Power")) {
-            if (comparator.ordinal() > Comparator.LT.ordinal()) comparator = Comparator.EXISTS;
-            if (comparator.ordinal() < Comparator.GTE.ordinal()) comparator = Comparator.GTE;
         } else {
             if (comparator.ordinal() > Comparator.NOT_EXISTS.ordinal()) comparator = Comparator.EXISTS;
         }
