@@ -95,9 +95,6 @@ public class ObtainingInfoScreen extends Screen {
                                         .collect(Collectors.joining(",")))
                                 .collect(Collectors.joining(",")
                                 );
-                        if (joinedCoordinates.isEmpty()) {
-                            System.out.println(droppedBy.coords);
-                        }
                         ConfirmLinkScreen.open(this, new URI("https://map.wynncraft.com/?coords=" + joinedCoordinates)
                         );
                     } catch (Exception e) {

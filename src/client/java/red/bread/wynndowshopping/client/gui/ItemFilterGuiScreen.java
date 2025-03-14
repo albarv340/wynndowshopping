@@ -219,7 +219,6 @@ public class ItemFilterGuiScreen extends Screen {
         }
         for (TextFieldWidget c : filterListConstant) {
             if ((filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("identification") || filterListOption.get(filterListConstant.indexOf(c)).getLastChoice().equals("base")) && !(itemFilters.get(filterListConstant.indexOf(c)).comparator.ordinal() <= Comparator.NOT_EXISTS.ordinal())) {
-                System.out.println("clicked constant");
                 c.setFocused(c.isMouseOver(mouseX, mouseY));
 //                c.mouseClicked(mouseX, mouseY, button);
             }

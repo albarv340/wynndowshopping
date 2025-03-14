@@ -5,9 +5,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import red.bread.wynndowshopping.client.util.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -52,6 +54,11 @@ public class DropdownWidget extends TextFieldWidget {
         scrollAmount = 0;
     }
 
+    @Override
+    public void setText(String text) {
+        super.setText(Utils.toUpperCamelCaseWithSpaces(text));
+    }
+
     public void setDefaultText(String newDefaultText) {
         defaultText = newDefaultText;
     }
@@ -69,11 +76,13 @@ public class DropdownWidget extends TextFieldWidget {
                 visualValidChoices = new ArrayList<>(visualChoices);
             } else {
                 for (String choice : visualChoices) {
-                    if (choice.toLowerCase().contains(getText().toLowerCase())) {
+                    if (choice.toLowerCase().contains(getText().toLowerCase().replace(" ", ""))) {
                         validChoices.add(choices.get(visualChoices.indexOf(choice)));
                         visualValidChoices.add(choice);
                     }
                 }
+                validChoices.sort(Comparator.comparing(s -> s.length() - getText().length()));
+                visualValidChoices.sort(Comparator.comparing(s -> s.length() - getText().length()));
             }
         }
         updateScrollLimits();
@@ -174,7 +183,7 @@ public class DropdownWidget extends TextFieldWidget {
         context.fill(getX(), getY() - 2, getX() + getWidth(), getY() + getHeight() + 2, Color.BLACK.getRGB());
 
         if (lastChoice.isEmpty() && !isFocused())
-            context.drawTextWithShadow(textRenderer, defaultText, this.getX() + 3, this.getY() + 3, 0x666666);
+            context.drawTextWithShadow(textRenderer, Utils.toUpperCamelCaseWithSpaces(defaultText), this.getX() + 3, this.getY() + 3, 0x666666);
     }
 
     // must be called manually
@@ -207,7 +216,7 @@ public class DropdownWidget extends TextFieldWidget {
                     finalText = visualValidChoices.get(i + scrollAmount);
                 }
                 //String finalText = textRenderer.trimToWidth(validChoices.get(i), this.width - 8);
-                context.drawTextWithShadow(textRenderer, finalText, this.getX() + 4, this.getY() + this.height + ((this.height + 1) * i) + 4, 0xFFFFFFFF);
+                context.drawTextWithShadow(textRenderer, Utils.toUpperCamelCaseWithSpaces(finalText), this.getX() + 4, this.getY() + this.height + ((this.height + 1) * i) + 4, 0xFFFFFFFF);
             }
 
             // draw scroll bar if needed

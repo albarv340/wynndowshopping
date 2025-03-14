@@ -205,19 +205,13 @@ public class WynnItem {
         if (!type.equals("tool")) {
             return "";
         }
-        if (toolType.equals("axe")) {
-            return "§f" + Utils.getProfessionIcon("woodcutting") + "§7 Woodcutting";
-        }
-        if (toolType.equals("scythe")) {
-            return "§f" + Utils.getProfessionIcon("farming") + "§7 Farming";
-        }
-        if (toolType.equals("rod")) {
-            return "§f" + Utils.getProfessionIcon("fishing") + "§7 Fishing";
-        }
-        if (toolType.equals("pickaxe")) {
-            return "§f" + Utils.getProfessionIcon("mining") + "§7 Mining";
-        }
-        return "";
+        return switch (toolType) {
+            case "axe" -> "§f" + Utils.getProfessionIcon("woodcutting") + "§7 Woodcutting";
+            case "scythe" -> "§f" + Utils.getProfessionIcon("farming") + "§7 Farming";
+            case "rod" -> "§f" + Utils.getProfessionIcon("fishing") + "§7 Fishing";
+            case "pickaxe" -> "§f" + Utils.getProfessionIcon("mining") + "§7 Mining";
+            default -> "";
+        };
     }
 
     private boolean isEffectivenessIngredient() {
@@ -266,10 +260,6 @@ public class WynnItem {
             case "duration" -> res = (consumableOnlyIDs.duration != null && consumableOnlyIDs.duration != 0) ? consumableOnlyIDs.duration: res;
             case "charges" -> res = (consumableOnlyIDs.charges != null && consumableOnlyIDs.charges != 0) ? consumableOnlyIDs.charges: res;
             case "ingredientEffectiveness" -> res = isEffectivenessIngredient() ? getTotalIngredientEffectiveness() : res;
-        }
-        if (res != 0) {
-            System.out.println(internalName);
-            System.out.println(res);
         }
         return res;
     }
@@ -509,7 +499,9 @@ public class WynnItem {
             }
         }
         if (type.equals("tool")) {
+            result.add(Text.empty());
             result.add(Text.of("§6Gathering Speed: " + gatheringSpeed));
+            result.add(Text.empty());
             result.add(Text.of("§c✖ §7" + getToolProfessionLabel() + "Lv. Min: " + requirements.level));
         }
         if (restrictions != null) {

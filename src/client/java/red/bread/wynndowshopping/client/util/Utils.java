@@ -26,21 +26,29 @@ public class Utils {
 
     public static String toUpperCamelCaseWithSpaces(String camelCase) {
         StringBuilder result = new StringBuilder();
+        boolean lastWasSpace = false;
 
         for (int i = 0; i < camelCase.length(); i++) {
             char currentChar = camelCase.charAt(i);
-
-            if (i == 0 || Character.isUpperCase(currentChar)) {
-                if (i > 0) {
-                    result.append(" ");
+            if (currentChar == ' ' || currentChar == '-') {
+                if (!lastWasSpace) {
+                    result.append(currentChar);
                 }
-                result.append(Character.toUpperCase(currentChar));
+                lastWasSpace = true;
             } else {
-                result.append(currentChar);
+                if (i == 0 || Character.isUpperCase(currentChar) || lastWasSpace) {
+                    if (i > 0 && !lastWasSpace) {
+                        result.append(" ");
+                    }
+                    result.append(Character.toUpperCase(currentChar));
+                } else {
+                    result.append(currentChar);
+                }
+                lastWasSpace = false;
             }
         }
 
-        return result.toString();
+        return result.toString().replaceAll(" +", " ");
     }
 
     public static String snakeToUpperCamelCaseWithSpaces(String snakeCase) {

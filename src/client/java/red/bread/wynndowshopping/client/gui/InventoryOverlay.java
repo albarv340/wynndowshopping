@@ -56,7 +56,7 @@ public class InventoryOverlay {
         this.overlayHeight = scaledHeight - pageControlHeight - filterHeight;
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);
         preExistingButtons = new ArrayList<>(Screens.getButtons(screen));
-        sortings = List.of(new Pair<>("Rarity", "By Rarity"), new Pair<>("A-Z", "Alphabetically"), new Pair<>("Lvl↑", "By Level Ascending"), new Pair<>("Lvl↓", "By Level Descending"), new Pair<>("Type", "By Type"));
+        sortings = List.of(new Pair<>("Rarity", "By Rarity"), new Pair<>("A-Z", "Alphabetically"), new Pair<>("Lvl↑", "By Level Ascending"), new Pair<>("Lvl↓", "By Level Descending"), new Pair<>("Type", "By Type"), new Pair<>("Filter", "By Active Filter"));
         if (items != null) {
             updateSort();
             updatePageCounts(items.size());
@@ -175,7 +175,6 @@ public class InventoryOverlay {
                     }
                 }
                 case "identification", "base" -> {
-                    System.out.println(filter.constant);
                     switch (filter.comparator) {
                         case EXISTS ->
                                 filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value)).toList();
@@ -186,6 +185,9 @@ public class InventoryOverlay {
                         case GT -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) > filter.constant).toList();
                         case GTE -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) >= filter.constant).toList();
                         case EQUALS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) == filter.constant).toList();
+                    }
+                    if (filter.comparator != red.bread.wynndowshopping.client.util.Comparator.NOT_EXISTS) {
+                        filteredItems = filteredItems.stream().sorted((o1, o2) -> o2.getB().getRawIdentificationValue(filter.value) - o1.getB().getRawIdentificationValue(filter.value)).toList();
                     }
                 }
             }
