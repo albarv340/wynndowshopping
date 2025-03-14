@@ -57,6 +57,7 @@ public class ObtainingInfoScreen extends Screen {
         // Make blur
         this.renderBackground(drawContext, mouseX, mouseY, delta);
         // Draw background
+        drawContext.fill(topLeftX - 1, topLeftY - 1, topLeftX + windowWidth + 1, topLeftY + windowHeight + 1, new Color(100, 100,100).getRGB());
         drawContext.fill(topLeftX, topLeftY, topLeftX + windowWidth, topLeftY + windowHeight, new Color(30, 15, 30).getRGB());
         drawContext.fill(topLeftX + frameSize, topLeftY + frameSize, topLeftX + windowWidth - frameSize, topLeftY + windowHeight - frameSize, new Color(129, 100, 75).getRGB());
         // Draw all buttons
@@ -108,7 +109,7 @@ public class ObtainingInfoScreen extends Screen {
             info.add(new Pair<>(Text.of("Drop Restriction: " + wynnItem.dropRestriction), null));
         }
         if (wynnItem.type.equals("material")) {
-            info.add(new Pair<>(Text.of("Profession Material: " + wynnItem.requirements.level + " " + wynnItem.getMaterialProfessionLabel()), null));
+            info.add(new Pair<>(Text.of("Profession Material: " + wynnItem.requirements.level + " " + wynnItem.getProfessionLabel()), null));
         }
         int rowIndex = 1;
         for (Pair<Text, ClickableWidget> infoPair : info) {

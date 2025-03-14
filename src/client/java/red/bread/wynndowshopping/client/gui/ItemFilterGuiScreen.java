@@ -136,7 +136,7 @@ public class ItemFilterGuiScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-//        this.renderBackground(context, mouseX, mouseY, delta);
+        this.renderBackground(context, mouseX, mouseY, delta);
 
         // draw filter buttons and stuff
         boolean anyOpen = false;

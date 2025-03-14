@@ -17,6 +17,7 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
         WynndowshoppingClient.possibleFilters.put("type", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("rarity", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("tier", new HashSet<>());
+        WynndowshoppingClient.possibleFilters.put("profession", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("identification", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("base", new HashSet<>());
         WynndowshoppingClient.possibleFilters.put("restriction", new HashSet<>());
@@ -65,6 +66,9 @@ public class WynnItemDeserializer implements JsonDeserializer<Map<String, WynnIt
             }
             if (wynnItem.restrictions != null) {
                 WynndowshoppingClient.possibleFilters.get("restriction").add(wynnItem.restrictions);
+            }
+            if (!wynnItem.getProfessions().isEmpty()) {
+                WynndowshoppingClient.possibleFilters.get("profession").addAll(wynnItem.getProfessions());
             }
         }
 

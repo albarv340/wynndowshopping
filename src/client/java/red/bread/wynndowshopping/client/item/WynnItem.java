@@ -182,36 +182,56 @@ public class WynnItem {
         return nameText;
     }
 
-    public String getMaterialProfessionLabel() {
-        if (!type.equals("material")) {
-            return "";
+    public List<String> getProfessions() {
+        List<String> res = new ArrayList<>();
+        if (type.equals("material")) {
+            if (internalName.contains("Wood") || internalName.contains("Paper")) {
+                res.add("woodcutting");
+            }
+            if (internalName.contains("Grain") || internalName.contains("String")) {
+                res.add("farming");
+            }
+            if (internalName.contains("Oil") || internalName.contains("Meat")) {
+                res.add("fishing");
+            }
+            if (internalName.contains("Gem") || internalName.contains("Ingot")) {
+                res.add("mining");
+            }
+            for (String crafted : craftable) {
+                switch (crafted) {
+                    case "scrolls" -> res.add("scribing");
+                    case "rings" -> res.add("jeweling");
+                    case "potions" -> res.add("alchemism");
+                    case "spears" -> res.add("weaponsmithing");
+                    case "bows" -> res.add("woodworking");
+                    case "food" -> res.add("cooking");
+                    case "helmets" -> res.add("armouring");
+                    case "leggings" -> res.add("tailoring");
+                }
+            }
         }
-        if (internalName.contains("Wood") || internalName.contains("Paper")) {
-            return "§f" + Utils.getProfessionIcon("woodcutting") + "§7 Woodcutting";
+        if (type.equals("ingredient")) {
+            return requirements.skills;
         }
-        if (internalName.contains("Grain") || internalName.contains("String")) {
-            return "§f" + Utils.getProfessionIcon("farming") + "§7 Farming";
+        if (type.equals("tool")) {
+            res.add(switch (toolType) {
+                case "axe" -> "woodcutting";
+                case "scythe" -> "farming";
+                case "rod" -> "fishing";
+                case "pickaxe" -> "mining";
+                default -> "";
+            });
         }
-        if (internalName.contains("Oil") || internalName.contains("Meat")) {
-            return "§f" + Utils.getProfessionIcon("fishing") + "§7 Fishing";
-        }
-        if (internalName.contains("Gem") || internalName.contains("Ingot")) {
-            return "§f" + Utils.getProfessionIcon("mining") + "§7 Mining";
-        }
-        return "";
+        return res;
     }
 
-    private String getToolProfessionLabel() {
-        if (!type.equals("tool")) {
+    public String getProfessionLabel() {
+        List<String> professions = getProfessions();
+        if (professions.isEmpty()) {
             return "";
         }
-        return switch (toolType) {
-            case "axe" -> "§f" + Utils.getProfessionIcon("woodcutting") + "§7 Woodcutting";
-            case "scythe" -> "§f" + Utils.getProfessionIcon("farming") + "§7 Farming";
-            case "rod" -> "§f" + Utils.getProfessionIcon("fishing") + "§7 Fishing";
-            case "pickaxe" -> "§f" + Utils.getProfessionIcon("mining") + "§7 Mining";
-            default -> "";
-        };
+        String profession = professions.getFirst();
+        return "§f" + Utils.getProfessionIcon(profession) + "§7 " + Utils.toUpperCamelCaseWithSpaces(profession);
     }
 
     private boolean isEffectivenessIngredient() {
@@ -495,14 +515,14 @@ public class WynnItem {
         if (type.equals("material")) {
             if (requirements.level > 0) {
                 result.add(Text.empty());
-                result.add(Text.of("§c✖ §7" + getMaterialProfessionLabel() + " Lv. Min: " + requirements.level));
+                result.add(Text.of("§c✖ §7" + getProfessionLabel() + " Lv. Min: " + requirements.level));
             }
         }
         if (type.equals("tool")) {
             result.add(Text.empty());
             result.add(Text.of("§6Gathering Speed: " + gatheringSpeed));
             result.add(Text.empty());
-            result.add(Text.of("§c✖ §7" + getToolProfessionLabel() + "Lv. Min: " + requirements.level));
+            result.add(Text.of("§c✖ §7" + getProfessionLabel() + " Lv. Min: " + requirements.level));
         }
         if (restrictions != null) {
             result.add(Text.of("§c" + Utils.toUpperCamelCaseWithSpaces(restrictions.replace(" item", "Item"))));

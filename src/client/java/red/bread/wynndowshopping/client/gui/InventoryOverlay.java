@@ -174,6 +174,14 @@ public class InventoryOverlay {
                                 filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().hasMajorId(filter.value)).toList();
                     }
                 }
+                case "profession" -> {
+                    switch (filter.comparator) {
+                        case EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().getProfessions().contains(filter.value)).toList();
+                        case NOT_EXISTS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().getProfessions().contains(filter.value)).toList();
+                    }
+                }
                 case "identification", "base" -> {
                     switch (filter.comparator) {
                         case EXISTS ->
@@ -188,6 +196,7 @@ public class InventoryOverlay {
                     }
                     if (filter.comparator != red.bread.wynndowshopping.client.util.Comparator.NOT_EXISTS) {
                         filteredItems = filteredItems.stream().sorted((o1, o2) -> o2.getB().getRawIdentificationValue(filter.value) - o1.getB().getRawIdentificationValue(filter.value)).toList();
+                        sortingIndex = 5;
                     }
                 }
             }
