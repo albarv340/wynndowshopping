@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -15,6 +17,7 @@ import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.item.WynnItem;
 import red.bread.wynndowshopping.client.util.Filter;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
+import red.bread.wynndowshopping.client.util.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class InventoryOverlay {
     private static int currentPage = 1;
     private static int totalPages = 1;
     private static int sortingIndex = 0;
+    public static boolean searchLore = false;
+    public static String currentSearchText = "";
     @Nullable
     private List<Pair<ItemStack, WynnItem>> items;
     private final Screen screen;
@@ -34,6 +39,7 @@ public class InventoryOverlay {
     private final int startX;
     private final Consumer<String> onSearchFieldChange;
     private final SearchTextFieldWidget searchTextFieldWidget;
+    private final CheckboxWidget searchLoreCheckbox;
     private boolean hasChanged = true;
     private final int slotSize = 20;
     private final int pageControlHeight = 40;
@@ -55,6 +61,11 @@ public class InventoryOverlay {
         this.overlayWidth = (scaledWidth - startX);
         this.overlayHeight = scaledHeight - pageControlHeight - filterHeight;
         this.searchTextFieldWidget = getSearchField(screen, scaledWidth, scaledHeight);
+        this.searchLoreCheckbox = CheckboxWidget.builder(Text.of(""), MinecraftClient.getInstance().textRenderer).pos((scaledWidth / 2) + 90, scaledHeight - 19).checked(searchLore).callback((checkbox, checked) -> {
+            searchLore = checked;
+            hasChanged = true;
+        }).build();
+        this.searchLoreCheckbox.setTooltip(Tooltip.of(Text.of("Search Lore")));
         preExistingButtons = new ArrayList<>(Screens.getButtons(screen));
         sortings = List.of(new Pair<>("Rarity", "By Rarity"), new Pair<>("A-Z", "Alphabetically"), new Pair<>("Lvl↑", "By Level Ascending"), new Pair<>("Lvl↓", "By Level Descending"), new Pair<>("Type", "By Type"), new Pair<>("Filter", "By Active Filter"));
         if (items != null) {
@@ -71,6 +82,7 @@ public class InventoryOverlay {
         Screens.getButtons(screen).clear();
         Screens.getButtons(screen).addAll(preExistingButtons);
         Screens.getButtons(screen).add(searchTextFieldWidget);
+        Screens.getButtons(screen).add(searchLoreCheckbox);
         if (shouldRenderItems()) {
             if (items == null) {
                 Screens.getButtons(screen).add(new ElevatedButtonWidget(startX, 0, overlayWidth, 20, Text.of("Error fetching items"), Text.of("Click here to retry"), button -> {
@@ -129,7 +141,7 @@ public class InventoryOverlay {
             return filteredItems;
         }
         filteredItems = items.stream().filter(itemStack -> itemStack.getB().requirements.level >= itemFilterGuiScreen.levelMin && itemStack.getB().requirements.level <= itemFilterGuiScreen.levelMax).toList();
-        filteredItems = filteredItems.stream().filter(itemStack -> itemStack.getA().getName().getString().toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())).toList();
+        filteredItems = filteredItems.stream().filter(itemStack -> Utils.itemMatches(itemStack.getA(), InventoryOverlay.currentSearchText, InventoryOverlay.searchLore)).toList();
         for (Filter filter : itemFilterGuiScreen.getItemFilters()) {
             if (filter.value.isEmpty()) {
                 continue;
@@ -189,11 +201,16 @@ public class InventoryOverlay {
                                 filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value)).toList();
                         case NOT_EXISTS ->
                                 filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> !itemStackWynnItemPair.getB().hasIdentification(filter.value)).toList();
-                        case LT -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) < filter.constant).toList();
-                        case LTE -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) <= filter.constant).toList();
-                        case GT -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) > filter.constant).toList();
-                        case GTE -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) >= filter.constant).toList();
-                        case EQUALS -> filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) == filter.constant).toList();
+                        case LT ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) < filter.constant).toList();
+                        case LTE ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) <= filter.constant).toList();
+                        case GT ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) > filter.constant).toList();
+                        case GTE ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) >= filter.constant).toList();
+                        case EQUALS ->
+                                filteredItems = filteredItems.stream().filter(itemStackWynnItemPair -> itemStackWynnItemPair.getB().hasIdentification(filter.value) && itemStackWynnItemPair.getB().getRawIdentificationValue(filter.value) == filter.constant).toList();
                     }
                     if (filter.comparator != red.bread.wynndowshopping.client.util.Comparator.NOT_EXISTS) {
                         filteredItems = filteredItems.stream().sorted((o1, o2) -> o2.getB().getRawIdentificationValue(filter.value) - o1.getB().getRawIdentificationValue(filter.value)).toList();
@@ -280,15 +297,9 @@ public class InventoryOverlay {
         final int HEIGHT = 20;
         final int WIDTH = 180;
         SearchTextFieldWidget searchTextFieldWidget;
-        searchTextFieldWidget = new SearchTextFieldWidget(screen.getTextRenderer(),
-                (scaledWidth / 2) - WIDTH / 2,
-                scaledHeight - HEIGHT - 1,
-                WIDTH,
-                HEIGHT,
-                Text.of(WynndowshoppingClient.currentSearchText)
-        );
+        searchTextFieldWidget = new SearchTextFieldWidget(screen.getTextRenderer(), (scaledWidth / 2) - WIDTH / 2, scaledHeight - HEIGHT - 1, WIDTH, HEIGHT, Text.of(currentSearchText));
         searchTextFieldWidget.setMaxLength(1000);
-        searchTextFieldWidget.setText(WynndowshoppingClient.currentSearchText);
+        searchTextFieldWidget.setText(currentSearchText);
         searchTextFieldWidget.setChangedListener(s -> {
             hasChanged = true;
             onSearchFieldChange.accept(s);

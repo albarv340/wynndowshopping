@@ -8,6 +8,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
+import red.bread.wynndowshopping.client.util.Utils;
 
 import java.awt.*;
 import java.util.*;
@@ -18,7 +19,7 @@ public class InventoryRenderer {
 
     public static void init(Screen screen, int scaledWidth, int scaledHeight) {
         inventoryOverlay = new InventoryOverlay(ItemStackBuilder.getAllItems(WynndowshoppingClient.items), screen, scaledWidth, scaledHeight, s -> {
-            WynndowshoppingClient.currentSearchText = s;
+            InventoryOverlay.currentSearchText = s;
             updateHighlightedSlots();
         });
         inventoryOverlay.redraw();
@@ -64,11 +65,9 @@ public class InventoryRenderer {
         if (MinecraftClient.getInstance().player != null) {
             DefaultedList<Slot> containerSlots = MinecraftClient.getInstance().player.currentScreenHandler.slots;
             highlightedSlots.clear();
-            if (WynndowshoppingClient.currentSearchText.isEmpty()) return;
+            if (InventoryOverlay.currentSearchText.isEmpty()) return;
             for (Slot slot : containerSlots) {
-                String itemName = slot.getStack().getName().getString();
-                if (itemName.equals("Air")) continue;
-                if (itemName.toLowerCase().contains(WynndowshoppingClient.currentSearchText.toLowerCase())) {
+                if (Utils.itemMatches(slot.getStack(), InventoryOverlay.currentSearchText, InventoryOverlay.searchLore)) {
                     highlightedSlots.add(slot.id);
                 }
             }

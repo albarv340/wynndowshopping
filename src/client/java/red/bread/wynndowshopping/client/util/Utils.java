@@ -1,8 +1,13 @@
 package red.bread.wynndowshopping.client.util;
 
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.net.URI;
@@ -138,6 +143,39 @@ public class Utils {
         professionIcons.put("woodworking", "Ⓘ");
 
         return professionIcons.getOrDefault(profession, "?");
+    }
+
+    public static boolean itemMatches(ItemStack itemStack, String query, boolean searchLore) {
+        String itemName = itemStack.getName().getString();
+        if (itemName.equals("Air")) return false;
+        String lore = String.join("\n", itemStack.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, TooltipType.ADVANCED).stream().map(Text::getString).toList());
+        // Split the query by OR (|) and AND (,) operators
+        String[] orConditions = query.split("\\|");
+        for (String orCondition : orConditions) {
+            // Split the OR group by AND (,) operator
+            String[] andConditions = orCondition.split(",");
+
+            boolean andMatched = true;  // Start with the assumption that all AND conditions are matched
+
+            // Check all AND conditions in the current OR group
+            for (String andCondition : andConditions) {
+                String condition = andCondition.trim().toLowerCase();
+
+                // If the condition is not found in either the item name or lore, this AND group is not matched
+                if (!(itemName.toLowerCase().contains(condition) || (searchLore && lore.toLowerCase().contains(condition)))) {
+                    andMatched = false;
+                    break;  // No need to check further, the AND group failed
+                }
+            }
+
+            // If all AND conditions in this OR group were matched, return true
+            if (andMatched) {
+                return true;
+            }
+        }
+
+        // If no OR group was fully satisfied, return false
+        return false;
     }
 
     public static double eval(final String str) {

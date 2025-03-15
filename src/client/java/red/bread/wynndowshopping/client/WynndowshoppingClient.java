@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 public class WynndowshoppingClient implements ClientModInitializer {
     public static boolean cancelContainerClose = false;
     public static boolean highlightSearchedString = false;
-    public static String currentSearchText = "";
     public static boolean isInteractedWith = false;
     public static Map<String, WynnItem> items;
     public static Map<String, Set<String>> possibleFilters = new HashMap<>();
