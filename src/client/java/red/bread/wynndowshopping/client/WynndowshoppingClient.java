@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import red.bread.wynndowshopping.client.customevents.OnMouseScrollCallback;
 import red.bread.wynndowshopping.client.gui.InventoryRenderer;
 import red.bread.wynndowshopping.client.item.*;
 import red.bread.wynndowshopping.client.util.ConfigFileUtil;
@@ -41,6 +42,7 @@ public class WynndowshoppingClient implements ClientModInitializer {
                 isInteractedWith = false;
             }
         });
+        OnMouseScrollCallback.EVENT.register(InventoryRenderer::onMouseScroll);
         updateItemsFromAPI();
     }
 

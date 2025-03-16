@@ -11,6 +11,7 @@ import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
@@ -113,6 +114,18 @@ public class InventoryOverlay {
         } else if (items != null) {
             updatePageCounts(items.size());
         }
+    }
+
+    public ActionResult onMouseScroll(double mouseX, double mouseY, double verticalAmount) {
+        if (mouseX > startX && mouseX < scaledWidth && mouseY > 0 && mouseY < scaledHeight) {
+            if (verticalAmount < 0) {
+                nextPage();
+            } else {
+                previousPage();
+            }
+            return ActionResult.FAIL; // Prevent other scroll events from triggering
+        }
+        return ActionResult.SUCCESS;
     }
 
     public void renderBackground(DrawContext drawContext) {
@@ -254,22 +267,30 @@ public class InventoryOverlay {
 
     private ElevatedButtonWidget getPrevButton() {
         return new ElevatedButtonWidget(startX, pageControlHeight / 4, overlayWidth / 4, pageControlHeight / 2, Text.of("< Prev"), button -> {
-            currentPage--;
-            if (currentPage < 1) {
-                currentPage = totalPages;
-            }
-            hasChanged = true;
+            previousPage();
         });
+    }
+
+    private void previousPage() {
+        currentPage--;
+        if (currentPage < 1) {
+            currentPage = totalPages;
+        }
+        hasChanged = true;
     }
 
     private ElevatedButtonWidget getNextButton() {
         return new ElevatedButtonWidget(startX + 3 * overlayWidth / 4, pageControlHeight / 4, overlayWidth / 4, pageControlHeight / 2, Text.of("Next >"), button -> {
-            currentPage++;
-            if (currentPage > totalPages) {
-                currentPage = 1;
-            }
-            hasChanged = true;
+            nextPage();
         });
+    }
+
+    private void nextPage() {
+        currentPage++;
+        if (currentPage > totalPages) {
+            currentPage = 1;
+        }
+        hasChanged = true;
     }
 
     private ElevatedButtonWidget getPageDisplayButton() {

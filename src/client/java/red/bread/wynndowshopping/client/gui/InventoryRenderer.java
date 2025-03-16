@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.util.ItemStackBuilder;
@@ -46,6 +47,13 @@ public class InventoryRenderer {
             inventoryOverlay.renderBackground(drawContext);
             inventoryOverlay.redraw();
         }
+    }
+
+    public static ActionResult onMouseScroll(double mouseX, double mouseY, double verticalAmount) {
+        if (inventoryOverlay != null && inventoryOverlay.shouldRenderItems()) {
+            return inventoryOverlay.onMouseScroll(mouseX, mouseY, verticalAmount);
+        }
+        return ActionResult.SUCCESS;
     }
 
     private static void highlightMatchingSLots(DrawContext drawContext, List<Slot> slots, int screenX, int screenY, int slotSize, int searchMissColor) {
