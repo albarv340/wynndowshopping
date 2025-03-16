@@ -31,6 +31,7 @@ public class ObtainingInfoScreen extends Screen {
     private final int frameSize = 20;
     private int topLeftX;
     private int topLeftY;
+    private int scrollAmount = 0;
     private boolean haveRenderedButtonsBeenAdded = false;
 
     public ObtainingInfoScreen(Screen parentScreen, WynnItem wynnItem, ItemStack itemStack) {
@@ -53,17 +54,23 @@ public class ObtainingInfoScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        //  TODO: Make scrollable
-        // Make blur
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        super.render(drawContext, mouseX, mouseY, delta);
         // Draw background
-        drawContext.fill(topLeftX - 1, topLeftY - 1, topLeftX + windowWidth + 1, topLeftY + windowHeight + 1, new Color(100, 100,100).getRGB());
-        drawContext.fill(topLeftX, topLeftY, topLeftX + windowWidth, topLeftY + windowHeight, new Color(30, 15, 30).getRGB());
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0f, 0f, 111f);
+        drawContext.fill(topLeftX - 1, topLeftY - 1, topLeftX + windowWidth + 1, topLeftY + frameSize, new Color(100, 100,100).getRGB());
+        drawContext.fill(topLeftX, topLeftY, topLeftX + windowWidth, topLeftY + frameSize, new Color(30, 15, 30).getRGB());
+        drawContext.fill(topLeftX - 1, topLeftY  + windowHeight - frameSize, topLeftX + windowWidth + 1, topLeftY + windowHeight, new Color(100, 100,100).getRGB());
+        drawContext.fill(topLeftX, topLeftY + windowHeight - frameSize, topLeftX + windowWidth, topLeftY + windowHeight, new Color(30, 15, 30).getRGB());
+        drawContext.drawTextWithShadow(textRenderer, this.title, topLeftX + frameSize + 5, this.height / 2 - windowHeight / 2 + 6, 0);
+        drawContext.getMatrices().pop();
+        drawContext.fill(topLeftX - 1, topLeftY, topLeftX, topLeftY + windowHeight, new Color(100, 100,100).getRGB());
+        drawContext.fill(topLeftX, topLeftY, topLeftX + frameSize, topLeftY + windowHeight, new Color(30, 15, 30).getRGB());
+        drawContext.fill(topLeftX + windowWidth, topLeftY, topLeftX + windowWidth + 1, topLeftY + windowHeight, new Color(100, 100,100).getRGB());
+        drawContext.fill(topLeftX + windowWidth - frameSize, topLeftY, topLeftX + windowWidth, topLeftY + windowHeight, new Color(30, 15, 30).getRGB());
         drawContext.fill(topLeftX + frameSize, topLeftY + frameSize, topLeftX + windowWidth - frameSize, topLeftY + windowHeight - frameSize, new Color(129, 100, 75).getRGB());
         // Draw all buttons
-        super.render(drawContext, mouseX, mouseY, delta);
         // Draw all infoPair
-        drawContext.drawTextWithShadow(textRenderer, this.title, topLeftX + frameSize + 5, this.height / 2 - windowHeight / 2 + 6, 0);
         List<Pair<Text, ClickableWidget>> info = new ArrayList<>();
         info.add(new Pair<>(Text.of("This item has the following information about obtaining it:"), null));
         if (wynnItem.dropMeta != null) {
@@ -101,7 +108,7 @@ public class ObtainingInfoScreen extends Screen {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                });
+                }, 1f);
                 info.add(new Pair<>(droppedByText, infoButton));
             }
         }
@@ -113,7 +120,10 @@ public class ObtainingInfoScreen extends Screen {
         }
         int rowIndex = 1;
         for (Pair<Text, ClickableWidget> infoPair : info) {
-            final int y = this.height / 2 - windowHeight / 2 + frameSize * rowIndex++;
+            final int y = scrollAmount + this.height / 2 - windowHeight / 2 + frameSize * rowIndex++;
+            if (y < topLeftY || y > topLeftY + windowHeight - frameSize) {
+                continue;
+            }
             drawContext.drawTextWithShadow(textRenderer, infoPair.getA(), topLeftX + frameSize + 5, y + 6, 0xffffff);
             if (!haveRenderedButtonsBeenAdded) {
                 if (infoPair.getB() != null) {
@@ -125,10 +135,22 @@ public class ObtainingInfoScreen extends Screen {
         haveRenderedButtonsBeenAdded = true;
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        final int scrolledBy = (int) verticalAmount * (client != null ? client.options.getGuiScale().getValue() : 1);
+        scrollAmount += scrolledBy;
+        for (ClickableWidget widget : Screens.getButtons(this)) {
+            if (widget.getMessage().getString().equals("§b!")) {
+                final int y = widget.getY() + scrolledBy;
+                widget.visible = y >= topLeftY && y <= topLeftY + windowHeight - frameSize;
+                widget.setY(y);
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
 
     @Override
     public void close() {
-//            super.close();
         MinecraftClient.getInstance().setScreen(parentScreen);
     }
 
