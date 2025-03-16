@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class InventoryOverlay {
+    public static boolean highlightSearchedString = false;
+    public static boolean isInteractedWith = false;
     private static int currentPage = 1;
     private static int totalPages = 1;
     private static int sortingIndex = 0;
@@ -123,6 +125,7 @@ public class InventoryOverlay {
             } else {
                 previousPage();
             }
+            ClickableWidget.playClickSound(MinecraftClient.getInstance().getSoundManager());
             return ActionResult.FAIL; // Prevent other scroll events from triggering
         }
         return ActionResult.SUCCESS;
@@ -134,7 +137,7 @@ public class InventoryOverlay {
     }
 
     public boolean shouldRenderItems() {
-        return WynndowshoppingClient.isInteractedWith;
+        return isInteractedWith;
     }
 
     private int getItemsPerPage() {
@@ -143,8 +146,15 @@ public class InventoryOverlay {
         return itemsPerRow * itemsPerColumn;
     }
 
-    private void switchSorting() {
+    private void nextSorting() {
         sortingIndex = (sortingIndex + 1) % sortings.size();
+        updateSort();
+    }
+    private void previousSorting() {
+        sortingIndex--;
+        if (sortingIndex < 0) {
+            sortingIndex = sortings.size() - 1;
+        }
         updateSort();
     }
 
@@ -302,7 +312,9 @@ public class InventoryOverlay {
         List<ElevatedButtonWidget> filterButtons = new ArrayList<>();
         final int y = scaledHeight - 3 * filterHeight / 4;
         filterButtons.add(new ElevatedButtonWidget(startX, y, overlayWidth / 4, 20, Text.of(sortings.get(sortingIndex).getA()), Text.of("Sort " + sortings.get(sortingIndex).getB()), button -> {
-            switchSorting();
+            nextSorting();
+        }, button -> {
+            previousSorting();
         }));
         filterButtons.add(new ElevatedButtonWidget(startX + overlayWidth / 4, y, overlayWidth / 2, 20, Text.of("Clear Filters"), Text.of("Clear Filters"), button -> {
             itemFilterGuiScreen.clearFilters();

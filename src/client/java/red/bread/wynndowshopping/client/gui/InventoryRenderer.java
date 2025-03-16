@@ -57,7 +57,7 @@ public class InventoryRenderer {
     }
 
     private static void highlightMatchingSLots(DrawContext drawContext, List<Slot> slots, int screenX, int screenY, int slotSize, int searchMissColor) {
-        if (!WynndowshoppingClient.highlightSearchedString) {
+        if (!InventoryOverlay.highlightSearchedString) {
             return;
         }
         for (Slot slot : slots) {

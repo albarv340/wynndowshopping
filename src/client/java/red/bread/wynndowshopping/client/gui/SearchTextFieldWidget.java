@@ -4,7 +4,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import red.bread.wynndowshopping.client.WynndowshoppingClient;
 import red.bread.wynndowshopping.client.util.Utils;
 
 import java.awt.*;
@@ -19,9 +18,9 @@ public class SearchTextFieldWidget extends TextFieldWidget {
     @Override
     public void onClick(double mouseX, double mouseY) {
         super.onClick(mouseX, mouseY);
-        WynndowshoppingClient.isInteractedWith = true;
+        InventoryOverlay.isInteractedWith = true;
         if (System.currentTimeMillis() - lastClick < 200) {
-            WynndowshoppingClient.highlightSearchedString = !WynndowshoppingClient.highlightSearchedString;
+            InventoryOverlay.highlightSearchedString = !InventoryOverlay.highlightSearchedString;
         }
         lastClick = System.currentTimeMillis();
     }
@@ -42,7 +41,7 @@ public class SearchTextFieldWidget extends TextFieldWidget {
         if (evaluatedExpression != null) {
             context.drawText(textRenderer, Text.of("=" + evaluatedExpression), getCharacterX(getText().length() - 1) + 10, getY() + 6, 0x00ff00, false);
         }
-        if (WynndowshoppingClient.highlightSearchedString) {
+        if (InventoryOverlay.highlightSearchedString) {
             context.fill(getX(), getY(), getX() + width, getY() + height, new Color(255, 255, 0, 50).getRGB());
         }
     }

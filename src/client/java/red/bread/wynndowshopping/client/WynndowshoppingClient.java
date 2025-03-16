@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import red.bread.wynndowshopping.client.customevents.OnMouseScrollCallback;
+import red.bread.wynndowshopping.client.gui.InventoryOverlay;
 import red.bread.wynndowshopping.client.gui.InventoryRenderer;
 import red.bread.wynndowshopping.client.item.*;
 import red.bread.wynndowshopping.client.util.ConfigFileUtil;
@@ -22,8 +23,6 @@ import java.util.function.Consumer;
 
 public class WynndowshoppingClient implements ClientModInitializer {
     public static boolean cancelContainerClose = false;
-    public static boolean highlightSearchedString = false;
-    public static boolean isInteractedWith = false;
     public static Map<String, WynnItem> items;
     public static Map<String, Set<String>> possibleFilters = new HashMap<>();
     private static boolean isCurrentlyFetchingItemData = false;
@@ -37,9 +36,9 @@ public class WynndowshoppingClient implements ClientModInitializer {
             }
         });
         ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
-            if (MinecraftClient.getInstance().currentScreen == null && isInteractedWith) {
+            if (MinecraftClient.getInstance().currentScreen == null && InventoryOverlay.isInteractedWith) {
                 // Hide the overlay if inventories are exited
-                isInteractedWith = false;
+                InventoryOverlay.isInteractedWith = false;
             }
         });
         OnMouseScrollCallback.EVENT.register(InventoryRenderer::onMouseScroll);
