@@ -31,7 +31,7 @@ public class ItemButtonWidget extends ButtonWidget {
                 return false; // This should never happen
             }
             if (button == 1) {
-                Utils.openURL(item.getName().getString(), currentScreen);
+                Utils.openWikiURL(wynnItem, currentScreen);
             } else if (button == 0) {
                 if (!(currentScreen instanceof ObtainingInfoScreen)) {
                     // Don't allow opening info screens inside of info screens

@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
+import red.bread.wynndowshopping.client.item.WynnItem;
 
 import java.awt.*;
 import java.net.URI;
@@ -96,11 +97,14 @@ public class Utils {
         return result.toString();
     }
 
-    public static void openURL(String itemName, Screen currentScreen) {
+    public static void openWikiURL(WynnItem wynnItem, Screen currentScreen) {
+        String wikiFormatName = Utils.spaceToUpperSnakeCase(wynnItem.name);
+        if (wynnItem.type.equals("tome")) {
+            wikiFormatName = "Tomes";
+        }
         try {
-            String formattedName = Utils.spaceToUpperSnakeCase(itemName.replaceAll("§.", "").replaceAll("\\[[^]]+]", "").trim());
-            String encodedName = URLEncoder.encode(formattedName, StandardCharsets.UTF_8);
-            ConfirmLinkScreen.open(currentScreen, new URI("https://wynncraft.wiki.gg/wiki/" + encodedName));
+            String encodedName = URLEncoder.encode(wikiFormatName, StandardCharsets.UTF_8);
+            ConfirmLinkScreen.open(currentScreen, new URI("https://wynncraft.wiki.gg/wiki/Special:Search?search=" + encodedName));
         } catch (Exception e) {
             e.printStackTrace();
         }
