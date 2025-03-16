@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 import red.bread.wynndowshopping.client.item.WynnItem;
 
 import java.awt.*;
@@ -108,6 +109,14 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean isKeyDown(int keyCode) {
+        return GLFW.glfwGetKey(MinecraftClient.getInstance().window.getHandle(), keyCode) == 1;
+    }
+
+    public static boolean isShiftDown() {
+        return isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
 

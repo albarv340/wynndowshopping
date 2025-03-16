@@ -4,12 +4,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import red.bread.wynndowshopping.client.item.WynnItem;
 import red.bread.wynndowshopping.client.util.Utils;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 public class ItemButtonWidget extends ButtonWidget {
     ItemStack item;
@@ -65,7 +66,9 @@ public class ItemButtonWidget extends ButtonWidget {
         context.drawItem(item, minX + 2, minY + 2);
         context.getMatrices().pop();
         if (isHovered() && MinecraftClient.getInstance().currentScreen != null) {
-            context.drawTooltip(MinecraftClient.getInstance().textRenderer, item.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, TooltipType.ADVANCED), mouseX, mouseY);
+            Stream<Text> infoTooltip = Utils.isShiftDown() ? Stream.of(Text.empty(), Text.of("§7Left-click for Drop Info"), Text.of("§7Right-click to Open Wiki")) : Stream.of(Text.empty(), Text.of("§7Hold SHIFT for Hints"));
+            List<Text> tooltip = Stream.concat(Stream.concat(Stream.of(Text.of(item.getName())), wynnItem.getLore().stream()), infoTooltip).toList();
+            context.drawTooltip(MinecraftClient.getInstance().textRenderer, tooltip, mouseX, mouseY);
         }
     }
 
